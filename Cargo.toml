@@ -12,3 +12,13 @@ bevy = { version = "0.16", features = ["wav"] }
 rand = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# Perfil de release optimizado para la compilación WebAssembly (Docker/Coolify):
+# - opt-level 2 compila mucho más rápido que 3 (Bevy es enorme) con una
+#   pérdida de rendimiento mínima para un juego educativo.
+# - debug = false elimina símbolos (menos tamaño y memoria).
+# El perfil nativo de escritorio no se ve afectado salvo al usar --release.
+[profile.release]
+opt-level = 2
+debug = false
+codegen-units = 16

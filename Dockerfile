@@ -25,17 +25,27 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Target de compilación web + herramienta de generación de bindings JS.
+# wasm-bindgen-cli se descarga precompilado (compilarlo desde fuente tarda
+# 5-10 min y consume mucha RAM en servidores pequeños).
 RUN rustup target add wasm32-unknown-unknown \
-    && cargo install wasm-bindgen-cli --version 0.2.127 --locked
+    && apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && curl -fsSL -o /tmp/wb.tar.gz \
+        https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.127/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl.tar.gz \
+    && tar -xzf /tmp/wb.tar.gz -C /usr/local \
+    && rm -f /tmp/wb.tar.gz \
+    && /usr/local/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl/wasm-bindgen --version \
+    && ln -sf /usr/local/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl/wasm-bindgen /usr/local/bin/wasm-bindgen
 
 WORKDIR /app
 
 # 1) Caché de dependencias: primero solo los manifiestos y un binario vacío,
 #    para que Docker no recompile todo Bevy cuando cambia solo el código.
+#    Se limitan los jobs a 2 para no agotar la RAM del servidor.
 COPY Cargo.toml Cargo.lock ./
 RUN mkdir -p src \
     && echo "fn main() {}" > src/main.rs \
-    && cargo build --release --target wasm32-unknown-unknown \
+    && RUSTFLAGS="-C panic=abort" CARGO_BUILD_JOBS=2 cargo build --release --target wasm32-unknown-unknown \
     && rm -rf src target/wasm32-unknown-unknown/release/gamecolegio* \
     && find target/wasm32-unknown-unknown/release -maxdepth 1 -type f -delete
 
@@ -45,7 +55,7 @@ COPY assets ./assets
 COPY index.html ./
 
 # Compila en modo release (optimizado).
-RUN cargo build --release --target wasm32-unknown-unknown
+RUN RUSTFLAGS="-C panic=abort" CARGO_BUILD_JOBS=2 cargo build --release --target wasm32-unknown-unknown
 
 # Genera los bindings JS de arranque para la web (directorio `web/`).
 RUN wasm-bindgen \
