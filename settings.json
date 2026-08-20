@@ -1,4 +1,5 @@
 {
-  "sensitivity": 10.0,
-  "volume": 50.0
+  "sensitivity": 5.0,
+  "volume": 80.0,
+  "language": "Es"
 }

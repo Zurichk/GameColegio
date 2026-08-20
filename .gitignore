@@ -1,3 +1,7 @@
 /target
 /docs
 /.cargo
+
+# Build web (wasm-bindgen) y archivos de guardado locales
+/web
+/savegame.json

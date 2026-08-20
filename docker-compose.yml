@@ -1,0 +1,9 @@
+# Composición opcional para probar la imagen localmente (Coolify puede
+# construir el Dockerfile directamente sin este archivo).
+services:
+  gamecolegio:
+    build: .
+    image: gamecolegio:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped

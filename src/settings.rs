@@ -4,7 +4,9 @@
 //! y se cierra con el botón "Volver" o la tecla Esc. Los valores se guardan
 //! en `settings.json` junto al guardado de partida.
 
+#[cfg(not(target_arch = "wasm32"))]
 use std::fs;
+#[cfg(not(target_arch = "wasm32"))]
 use std::path::{Path, PathBuf};
 
 use bevy::audio::{AudioSink, GlobalVolume, Volume};
@@ -318,6 +320,9 @@ fn settings_input(
 // ---- Persistencia ----------------------------------------------------------
 
 /// Ruta del archivo de ajustes.
+/// En la web (WASM) no hay sistema de archivos: se devuelve `None` y los
+/// ajustes se mantienen solo en memoria (los predeterminados al recargar).
+#[cfg(not(target_arch = "wasm32"))]
 fn settings_path() -> Option<PathBuf> {
     if let Some(root) = std::env::var_os("BEVY_ASSET_ROOT") {
         return Some(Path::new(&root).join("settings.json"));
@@ -325,7 +330,15 @@ fn settings_path() -> Option<PathBuf> {
     std::env::current_dir().ok().map(|dir| dir.join("settings.json"))
 }
 
+#[cfg(target_arch = "wasm32")]
+#[allow(dead_code)]
+fn settings_path() -> Option<std::path::PathBuf> {
+    None
+}
+
 /// Carga los ajustes guardados (o los predeterminados si no existen).
+/// En la web no hay persistencia: siempre los predeterminados.
+#[cfg(not(target_arch = "wasm32"))]
 fn load_settings() -> Settings {
     let Some(path) = settings_path() else {
         return Settings::default();
@@ -336,7 +349,14 @@ fn load_settings() -> Settings {
     serde_json::from_str(&text).unwrap_or_default()
 }
 
+#[cfg(target_arch = "wasm32")]
+fn load_settings() -> Settings {
+    Settings::default()
+}
+
 /// Guarda los ajustes en `settings.json`.
+/// En la web no hay persistencia: no-op.
+#[cfg(not(target_arch = "wasm32"))]
 fn save_settings(settings: &Settings) {
     let Some(path) = settings_path() else {
         return;
@@ -347,6 +367,9 @@ fn save_settings(settings: &Settings) {
         }
     }
 }
+
+#[cfg(target_arch = "wasm32")]
+fn save_settings(_settings: &Settings) {}
 
 // ---- Helpers de UI ---------------------------------------------------------
 

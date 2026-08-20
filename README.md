@@ -31,6 +31,13 @@ se pueden retomar.
 > y **geografía de España**, 62 preguntas) y **Memoria** (los 6 juegos
 > existentes).
 > Ver [docs/progreso.md](docs/progreso.md) para el detalle de fases.
+>
+> **Internacionalización completa (20/08/2026)**: todo el juego es
+> **trilingüe (Español/English/Français)** con selector de idioma en los
+> Ajustes: menús, HUD, diálogos de profesores, los 6 juegos de aprendizaje y
+> **el banco completo del tablero con 1.826 preguntas por idioma**. Además:
+> **juego nuevo "Mayor, menor o igual"** (Matemáticas) y **despliegue web**
+> (WASM + Dockerfile para Coolify).
 
 ## Requisitos
 
@@ -38,13 +45,6 @@ se pueden retomar.
 - **Toolchain GNU** (`x86_64-pc-windows-gnu`) con MinGW-w64, configurado en
   `.cargo/config.toml`.
 - Los binarios se generan en `target/x86_64-pc-windows-gnu/debug/`.
-
-## Instalación
-
-```bash
-git clone <url-del-repositorio> gamecolegio
-cd gamecolegio
-```
 
 ## Ejecución
 
@@ -66,6 +66,31 @@ Para ejecutar los tests (colisiones AABB, etc.):
 ```bash
 cargo test
 ```
+
+## Despliegue web (Docker / Coolify)
+
+El juego también compila a **WebAssembly** y se sirve como página estática:
+
+```bash
+# Build de la imagen (compila el WASM con wasm-bindgen y lo sirve con nginx)
+docker build -t gamecolegio .
+
+# Probar localmente
+docker run -p 8080:80 gamecolegio
+# → abrir http://localhost:8080
+```
+
+En **Coolify** basta con apuntar el proyecto al repositorio (usa el
+`Dockerfile` de la raíz); la aplicación se sirve en el puerto `80`. Detalles:
+
+- **`Dockerfile`**: build multi-etapa (Rust 1.97 + target `wasm32` +
+  `wasm-bindgen` 0.2.127 + `wasm-opt`) → nginx estático.
+- **`nginx.conf`**: MIME correcto para `.wasm`, caché larga para assets y
+  fallback a `index.html`.
+- **`index.html`**: página de arranque que carga `gamecolegio.js`.
+- En la web el **guardado de partida y los ajustes** se mantienen solo en
+  memoria (no hay sistema de archivos); el resto del juego es idéntico.
+- Requiere un navegador con **WebGL2**.
 
 ## Controles
 
@@ -224,6 +249,16 @@ colegio. En los menús y en el modo tablero el cursor es libre para hacer clic.
   (menú principal o pausa) se abre un modal **"¿Seguro que quieres salir
   del juego?"** con "Sí, salir" / "Cancelar" (o Esc para cancelar); solo se
   cierra la aplicación al confirmar.
+- **Mayor, menor o igual (20/08/2026)**: nuevo juego de Matemáticas en el
+  que se muestran dos números y hay que elegir si el primero es mayor (>),
+  menor (<) o igual (=); 10 rondas con dificultad creciente, feedback
+  inmediato y nota final.
+- **Traducción completa ES/EN/FR (20/08/2026)**: selector de idioma en los
+  Ajustes (Español/English/Français) que traduce menús, HUD, diálogos y
+  **todas las preguntas** (los 6 juegos de aprendizaje y el banco del tablero
+  con 1.826 preguntas por idioma).
+- **Despliegue web (20/08/2026)**: el juego compila a **WASM** y se sirve
+  con nginx mediante el `Dockerfile` (listo para **Coolify**).
 - **Mejora gráfica del colegio (19/08/2026)**: **ventanas con cristal
   luminoso** (emisión suave), **paneles de luz de techo** (emisivos) en las
   3 aulas, pasillo y recepción, **taquillas de colores** en el pasillo,
@@ -249,6 +284,7 @@ src/
 │   ├── hangman.rs       # Ahorcado (48 palabras, teclado en pantalla, 6 fallos)
 │   ├── math.rs          # Sumar/restar/multiplicar/dividir (10 rondas, A/B/C/D)
 │   ├── mental.rs        # Cálculo mental (12 s por operación)
+│   ├── compare.rs       # Mayor, menor o igual (10 rondas, > < =)
 │   ├── trivia.rs        # Ciencias naturales (30) y Geografía de España (32)
 │   ├── memory.rs        # Juegos de memoria (letras/números/mixtas/formas/palabras)
 │   └── sequence.rs      # Memoria de secuencia (estilo Simón)
@@ -335,3 +371,13 @@ Ver [docs/progreso.md](docs/progreso.md). Resumen:
 - **Corrección de visibilidad** ✅ `Visibility::Visible` → `Inherited` en los
   botones para que los modales y paneles ocultos no se dibujen encima
   (Bevy 0.16 hace que `Visible` ignore al padre) (completada 19/08/2026).
+- **Internacionalización** ✅ Español/English/Français en toda la interfaz y
+  en **todas las preguntas** (6 juegos de aprendizaje + banco del tablero de
+  1.826 por idioma) (completada 20/08/2026).
+- **Juego "Mayor, menor o igual"** ✅ Nueva actividad de Matemáticas
+  (completada 20/08/2026).
+- **Despliegue web** ✅ Compilación WASM + Dockerfile para Coolify
+  (completada 20/08/2026).
+- **Cámara sin atravesar paredes** ✅ La cámara en tercera persona evita
+  colisionar con el edificio muestreando el segmento jugador→deseado
+  (completada 20/08/2026).

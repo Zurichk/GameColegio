@@ -9,15 +9,19 @@
 # =============================================================================
 
 # ---- Etapa 1: build del WASM ------------------------------------------------
-FROM rust:1.85-bookworm AS build
+FROM rust:1.97-bookworm AS build
 
 # Dependencias de sistema que Bevy necesita (alsa/udev se usan en build
-# scripts aunque el target final sea wasm; pkg-config es imprescindible).
+# scripts aunque el target final sea wasm; clang/lld para los build scripts
+# que compilan C; pkg-config es imprescindible).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         pkg-config \
         libasound2-dev \
         libudev-dev \
+        clang \
+        lld \
+        binaryen \
     && rm -rf /var/lib/apt/lists/*
 
 # Target de compilación web + herramienta de generación de bindings JS.
@@ -26,9 +30,16 @@ RUN rustup target add wasm32-unknown-unknown \
 
 WORKDIR /app
 
-# Capa de dependencias: primero solo Cargo.toml/Cargo.lock para aprovechar
-# la caché de Docker (el build de Bevy es largo).
+# 1) Caché de dependencias: primero solo los manifiestos y un binario vacío,
+#    para que Docker no recompile todo Bevy cuando cambia solo el código.
 COPY Cargo.toml Cargo.lock ./
+RUN mkdir -p src \
+    && echo "fn main() {}" > src/main.rs \
+    && cargo build --release --target wasm32-unknown-unknown \
+    && rm -rf src target/wasm32-unknown-unknown/release/gamecolegio* \
+    && find target/wasm32-unknown-unknown/release -maxdepth 1 -type f -delete
+
+# 2) El código real del juego + assets.
 COPY src ./src
 COPY assets ./assets
 COPY index.html ./
@@ -41,6 +52,12 @@ RUN wasm-bindgen \
         --target web \
         --out-dir web \
         target/wasm32-unknown-unknown/release/gamecolegio.wasm
+
+# Optimiza el WASM (reduce mucho el tamaño: Bevy en debug pesa decenas de MB).
+RUN wasm-opt -O3 \
+        --enable-bulk-memory \
+        web/gamecolegio_bg.wasm \
+        -o web/gamecolegio_bg.wasm
 
 # ---- Etapa 2: servidor web estático -----------------------------------------
 FROM nginx:1.27-alpine
