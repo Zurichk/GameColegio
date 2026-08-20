@@ -274,7 +274,26 @@ fn spawn_button(
             marker,
         ))
         .with_children(|button| {
-            button.spawn(ui_text(label, 26.0, Color::WHITE, font));
+            button.spawn((
+                Text::new(tr(label)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 26.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+                // Centra las líneas del texto dentro de su propia caja: si el
+                // texto se rompe en varias líneas, quedan centradas y no
+                // alineadas a la izquierda como por defecto.
+                TextLayout {
+                    justify: JustifyText::Center,
+                    ..default()
+                },
+                Node {
+                    width: Val::Percent(100.0),
+                    ..default()
+                },
+            ));
         });
 }
 

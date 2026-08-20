@@ -5,5 +5,5 @@ services:
     build: .
     image: gamecolegio:latest
     ports:
-      - "8080:80"
+      - "5005:5005"
     restart: unless-stopped

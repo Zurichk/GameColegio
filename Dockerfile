@@ -73,4 +73,6 @@ COPY --from=build /app/index.html /usr/share/nginx/html/index.html
 # Assets del juego (fuentes y efectos de sonido).
 COPY --from=build /app/assets/ /usr/share/nginx/html/assets/
 
-EXPOSE 80
+# Puerto interno del contenedor (5005, estilo Flask): en Coolify se publica
+# al exterior con el puerto que se prefiera; así no choca con otras webs del 80.
+EXPOSE 5005

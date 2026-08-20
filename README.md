@@ -75,18 +75,21 @@ El juego también compila a **WebAssembly** y se sirve como página estática:
 # Build de la imagen (compila el WASM con wasm-bindgen y lo sirve con nginx)
 docker build -t gamecolegio .
 
-# Probar localmente
-docker run -p 8080:80 gamecolegio
-# → abrir http://localhost:8080
+# Probar localmente (el puerto externo se puede cambiar libremente)
+docker run -p 5005:5005 gamecolegio
+# → abrir http://localhost:5005
 ```
 
 En **Coolify** basta con apuntar el proyecto al repositorio (usa el
-`Dockerfile` de la raíz); la aplicación se sirve en el puerto `80`. Detalles:
+`Dockerfile` de la raíz). El contenedor escucha en el **puerto interno
+5005** (estilo Flask, evita conflictos con otras webs del servidor en el
+80); en la configuración del despliegue se elige el **puerto externo** que
+se quiera publicar. Detalles:
 
 - **`Dockerfile`**: build multi-etapa (Rust 1.97 + target `wasm32` +
-  `wasm-bindgen` 0.2.127 + `wasm-opt`) → nginx estático.
-- **`nginx.conf`**: MIME correcto para `.wasm`, caché larga para assets y
-  fallback a `index.html`.
+  `wasm-bindgen` 0.2.127 + `wasm-opt`) → nginx estático (`EXPOSE 5005`).
+- **`nginx.conf`**: escucha en `5005`, MIME correcto para `.wasm`, caché
+  larga para assets y fallback a `index.html`.
 - **`index.html`**: página de arranque que carga `gamecolegio.js`.
 - En la web el **guardado de partida y los ajustes** se mantienen solo en
   memoria (no hay sistema de archivos); el resto del juego es idéntico.
