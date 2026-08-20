@@ -1,0 +1,19 @@
+# Dependencias y salidas de compilación
+target/
+build/
+node_modules/
+
+# Archivos de guardado locales (no deben entrar en la imagen)
+savegame.json
+
+# Control de versiones e IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Documentación local
+docs/
+
+# No recompilar desde la imagen: los .wav generados ya están en assets/sfx
+# y se copian tal cual.
