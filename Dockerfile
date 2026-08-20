@@ -13,7 +13,8 @@ FROM rust:1.97-bookworm AS build
 
 # Dependencias de sistema que Bevy necesita (alsa/udev se usan en build
 # scripts aunque el target final sea wasm; clang/lld para los build scripts
-# que compilan C; pkg-config es imprescindible).
+# que compilan C; pkg-config es imprescindible; curl para descargar
+# wasm-bindgen precompilado).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         pkg-config \
@@ -22,20 +23,20 @@ RUN apt-get update \
         clang \
         lld \
         binaryen \
+        curl \
+        ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Target de compilación web + herramienta de generación de bindings JS.
 # wasm-bindgen-cli se descarga precompilado (compilarlo desde fuente tarda
 # 5-10 min y consume mucha RAM en servidores pequeños).
 RUN rustup target add wasm32-unknown-unknown \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates \
     && curl -fsSL -o /tmp/wb.tar.gz \
         https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.127/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl.tar.gz \
     && tar -xzf /tmp/wb.tar.gz -C /usr/local \
     && rm -f /tmp/wb.tar.gz \
-    && /usr/local/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl/wasm-bindgen --version \
-    && ln -sf /usr/local/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl/wasm-bindgen /usr/local/bin/wasm-bindgen
+    && ln -sf /usr/local/wasm-bindgen-0.2.127-x86_64-unknown-linux-musl/wasm-bindgen /usr/local/bin/wasm-bindgen \
+    && wasm-bindgen --version
 
 WORKDIR /app
 
