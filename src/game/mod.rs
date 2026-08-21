@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use crate::audio::SfxPlugin;
 use crate::board::BoardPlugin;
 use crate::camera::ThirdPersonCameraPlugin;
+use crate::classic::ClassicPlugin;
 use crate::fx::FxPlugin;
 use crate::hud::HudPlugin;
 use crate::learning::LearningPlugin;
@@ -73,6 +74,8 @@ pub enum GameState {
     SynonymsPractice,
     /// Anagramas (Lengua).
     AnagramPractice,
+    /// Vocabulario (Lengua).
+    VocabPractice,
     /// Práctica de sumar/restar/multiplicar/dividir.
     MathPractice,
     /// Práctica de cálculo mental con temporizador.
@@ -85,10 +88,20 @@ pub enum GameState {
     GeometryPractice,
     /// Problemas de texto (Matemáticas).
     WordProblemsPractice,
+    /// Adivina el número (1-100).
+    GuessNumberGame,
     /// Cuestionario de ciencias naturales.
     SciencePractice,
     /// Cuestionario de geografía de España.
     GeographyPractice,
+    /// Menú de juegos clásicos (multijuegos).
+    ClassicMenu,
+    /// Tres en raya.
+    TicTacToeGame,
+    /// Conecta 4.
+    Connect4Game,
+    /// Hundir la flota.
+    BattleshipGame,
     /// Menú de los juegos de memoria.
     MemoryMenu,
     /// Juego de memoria (emparejar tarjetas) en curso.
@@ -123,6 +136,7 @@ impl Plugin for GamePlugin {
                 FxPlugin,
                 BoardPlugin,
                 LearningPlugin,
+                ClassicPlugin,
             ));
     }
 }

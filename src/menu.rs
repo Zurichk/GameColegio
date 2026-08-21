@@ -31,6 +31,10 @@ pub struct AjustesButton;
 #[derive(Component)]
 pub struct LearningButton;
 
+/// Botón de juegos clásicos.
+#[derive(Component)]
+pub struct ClassicButton;
+
 /// Botón de salir del juego.
 #[derive(Component)]
 pub struct QuitButton;
@@ -99,6 +103,7 @@ fn spawn_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             }
             spawn_button(root, "Modo Tablero", BoardModeButton, &font);
             spawn_button(root, "Zona de aprendizaje", LearningButton, &font);
+            spawn_button(root, "Juegos Clásicos", ClassicButton, &font);
             spawn_button(root, "Ajustes", AjustesButton, &font);
             spawn_button(root, "Salir del juego", QuitButton, &font);
 
@@ -174,6 +179,7 @@ fn menu_input(
             Option<&BoardModeButton>,
             Option<&ContinueButton>,
             Option<&LearningButton>,
+            Option<&ClassicButton>,
             Option<&AjustesButton>,
             Option<&QuitButton>,
             Option<&QuitYesButton>,
@@ -201,6 +207,7 @@ fn menu_input(
         board,
         continue_btn,
         learning,
+        classic,
         ajustes,
         quit,
         quit_yes,
@@ -240,6 +247,8 @@ fn menu_input(
             }
         } else if learning.is_some() {
             next_state.set(GameState::LearningMenu);
+        } else if classic.is_some() {
+            next_state.set(GameState::ClassicMenu);
         } else if ajustes.is_some() {
             commands.insert_resource(SettingsReturn(GameState::MainMenu));
             next_state.set(GameState::Settings);

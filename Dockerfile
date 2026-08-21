@@ -38,11 +38,9 @@ RUN rustup target add wasm32-unknown-unknown \
 
 WORKDIR /app
 
-# Fix WASM `Table.grow` — Bevy 0.16 usa getrandom 0.3 que en wasm debe usar el
-# backend `wasm_js` (si no, el runtime intenta hacer grow de la table y falla
-# con `RangeError: WebAssembly.Table.grow(): failed to grow table by 4`).
-# Se fija tanto por Cargo.toml (getrandom wasm_js) como por RUSTFLAGS aquí.
-ENV RUSTFLAGS="--cfg getrandom_backend=\"wasm_js\""
+# Build WASM — el fix de Table.grow ahora está en Cargo.toml con alias
+# getrandom_02/03/04 (todos con backend js/wasm_js), así que no hace falta
+# forzar RUSTFLAGS aquí. Se deja CARGO_BUILD_JOBS=1 para no OOM en VPS 2GB.
 ENV CARGO_INCREMENTAL=0
 ENV CARGO_NET_RETRY=3
 ENV CARGO_BUILD_JOBS=1

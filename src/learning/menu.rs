@@ -71,6 +71,10 @@ pub struct SynonymsButton;
 #[derive(Component)]
 pub struct AnagramButton;
 
+/// Botón de vocabulario.
+#[derive(Component)]
+pub struct VocabButton;
+
 /// Botón de volver a la zona de aprendizaje.
 #[derive(Component)]
 pub struct LanguageBackButton;
@@ -116,6 +120,10 @@ pub struct GeometryButton;
 /// Botón de problemas.
 #[derive(Component)]
 pub struct WordProblemsButton;
+
+/// Botón de adivina el número.
+#[derive(Component)]
+pub struct GuessNumberButton;
 
 /// Botón de volver a la zona de aprendizaje.
 #[derive(Component)]
@@ -359,6 +367,7 @@ fn spawn_language_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Ahorcado", HangmanButton, &font);
             spawn_button(root, "Sinónimos", SynonymsButton, &font);
             spawn_button(root, "Anagramas", AnagramButton, &font);
+            spawn_button(root, "Vocabulario", VocabButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
                 ..default()
@@ -386,6 +395,7 @@ fn language_menu_input(
             Option<&HangmanButton>,
             Option<&SynonymsButton>,
             Option<&AnagramButton>,
+            Option<&VocabButton>,
             Option<&LanguageBackButton>,
         ),
         Changed<Interaction>,
@@ -395,7 +405,7 @@ fn language_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, reading, spelling, hangman, synonyms, anagram, back) in &interactions {
+    for (interaction, reading, spelling, hangman, synonyms, anagram, vocab, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -409,6 +419,8 @@ fn language_menu_input(
             next_state.set(GameState::SynonymsPractice);
         } else if anagram.is_some() {
             next_state.set(GameState::AnagramPractice);
+        } else if vocab.is_some() {
+            next_state.set(GameState::VocabPractice);
         } else if back.is_some() {
             next_state.set(GameState::LearningMenu);
         }
@@ -459,6 +471,7 @@ fn spawn_math_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Fracciones", FractionsButton, &font);
             spawn_button(root, "Geometría", GeometryButton, &font);
             spawn_button(root, "Problemas", WordProblemsButton, &font);
+            spawn_button(root, "Adivina el Número", GuessNumberButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
                 ..default()
@@ -491,6 +504,7 @@ fn math_menu_input(
             Option<&FractionsButton>,
             Option<&GeometryButton>,
             Option<&WordProblemsButton>,
+            Option<&GuessNumberButton>,
             Option<&MathBackButton>,
         ),
         Changed<Interaction>,
@@ -500,7 +514,7 @@ fn math_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, add, sub, mul, div, mental, compare, fractions, geometry, problems, back) in &interactions {
+    for (interaction, add, sub, mul, div, mental, compare, fractions, geometry, problems, guess, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -526,6 +540,8 @@ fn math_menu_input(
             next_state.set(GameState::GeometryPractice);
         } else if problems.is_some() {
             next_state.set(GameState::WordProblemsPractice);
+        } else if guess.is_some() {
+            next_state.set(GameState::GuessNumberGame);
         } else if back.is_some() {
             next_state.set(GameState::LearningMenu);
         }

@@ -10,6 +10,7 @@
 pub mod board;
 mod audio;
 mod camera;
+mod classic;
 mod fx;
 mod game;
 mod hud;

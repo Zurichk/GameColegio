@@ -583,8 +583,8 @@ const SCIENCE_QUESTIONS: [TriviaQuestion; 30] = [
     TriviaQuestion { question: "¿Qué órgano usamos para respirar?", options: ["El hígado", "Los pulmones", "El riñón", "El estómago"], correct: 1 },
 ];
 
-/// Preguntas de geografía de España.
-const GEOGRAPHY_QUESTIONS: [TriviaQuestion; 32] = [
+/// Preguntas de geografía de España — 52 preguntas.
+const GEOGRAPHY_QUESTIONS: [TriviaQuestion; 52] = [
     TriviaQuestion { question: "¿Cuál es la capital de España?", options: ["Barcelona", "Madrid", "Sevilla", "Valencia"], correct: 1 },
     TriviaQuestion { question: "¿Qué río pasa por Sevilla?", options: ["El Ebro", "El Duero", "El Guadalquivir", "El Tajo"], correct: 2 },
     TriviaQuestion { question: "¿Cuál es el río más largo de España?", options: ["El Ebro", "El Guadalquivir", "El Duero", "El Tajo"], correct: 3 },
@@ -617,6 +617,26 @@ const GEOGRAPHY_QUESTIONS: [TriviaQuestion; 32] = [
     TriviaQuestion { question: "¿Cuál es la capital de Navarra?", options: ["San Sebastián", "Vitoria", "Logroño", "Pamplona"], correct: 3 },
     TriviaQuestion { question: "¿Qué islas están en el mar Mediterráneo?", options: ["Las Canarias", "Las Baleares", "Las Azores", "Las Cíes"], correct: 1 },
     TriviaQuestion { question: "¿Cuál es la capital de Euskadi?", options: ["Bilbao", "San Sebastián", "Vitoria-Gasteiz", "Logroño"], correct: 2 },
+    TriviaQuestion { question: "¿En qué ciudad está la Alhambra?", options: ["Granada", "Sevilla", "Córdoba", "Jaén"], correct: 0 },
+    TriviaQuestion { question: "¿Qué país limita al norte con España?", options: ["Portugal", "Andorra", "Francia", "Marruecos"], correct: 2 },
+    TriviaQuestion { question: "¿Cuál es la isla más grande de Canarias?", options: ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura"], correct: 0 },
+    TriviaQuestion { question: "¿Qué río es el más caudaloso de España?", options: ["Tajo", "Ebro", "Duero", "Guadalquivir"], correct: 1 },
+    TriviaQuestion { question: "¿En qué provincia está la Costa del Sol?", options: ["Málaga", "Almería", "Cádiz", "Huelva"], correct: 0 },
+    TriviaQuestion { question: "¿Cuál es la capital de la provincia de Lérida?", options: ["Lérida", "Tarragona", "Gerona", "Barcelona"], correct: 0 },
+    TriviaQuestion { question: "¿Qué mar baña Baleares?", options: ["Cantábrico", "Mediterráneo", "Atlántico", "Negro"], correct: 1 },
+    TriviaQuestion { question: "¿En qué comunidad está el Teide?", options: ["Andalucía", "Canarias", "Baleares", "Valencia"], correct: 1 },
+    TriviaQuestion { question: "¿Cuál es la provincia más pequeña de España?", options: ["Guipúzcoa", "Vizcaya", "Cantabria", "Álava"], correct: 0 },
+    TriviaQuestion { question: "¿Qué ciudad tiene la Mezquita famosa?", options: ["Sevilla", "Granada", "Córdoba", "Toledo"], correct: 2 },
+    TriviaQuestion { question: "¿En qué isla está el Teide?", options: ["Tenerife", "Gran Canaria", "La Palma", "El Hierro"], correct: 0 },
+    TriviaQuestion { question: "¿Cuál es la capital de Huelva?", options: ["Huelva", "Sevilla", "Málaga", "Cádiz"], correct: 0 },
+    TriviaQuestion { question: "¿Qué provincia es famosa por la paella?", options: ["Valencia", "Alicante", "Castellón", "Murcia"], correct: 0 },
+    TriviaQuestion { question: "¿En qué comunidad está Doñana?", options: ["Extremadura", "Andalucía", "Murcia", "Valencia"], correct: 1 },
+    TriviaQuestion { question: "¿Qué ciudad está en la Costa Brava?", options: ["Gerona", "Barcelona", "Tarragona", "Lérida"], correct: 0 },
+    TriviaQuestion { question: "¿Cuál es la capital de Teruel?", options: ["Teruel", "Huesca", "Zaragoza", "Lérida"], correct: 0 },
+    TriviaQuestion { question: "¿Qué río pasa por Salamanca?", options: ["Duero", "Tormes", "Tajo", "Ebro"], correct: 1 },
+    TriviaQuestion { question: "¿En qué comunidad está la Ribeira Sacra?", options: ["Asturias", "Cantabria", "Galicia", "País Vasco"], correct: 2 },
+    TriviaQuestion { question: "¿Cuál es la playa más famosa de San Sebastián?", options: ["La Concha", "Ondarreta", "Zurriola", "Malvarrosa"], correct: 0 },
+    TriviaQuestion { question: "¿Qué islas forman Cabrera?", options: ["Baleares", "Canarias", "Azores", "Cíes"], correct: 0 },
 ];
 
 /// Preguntas de ciencias naturales en inglés.
@@ -654,7 +674,7 @@ const SCIENCE_QUESTIONS_EN: [TriviaQuestion; 30] = [
 ];
 
 /// Preguntas de geografía de España en inglés.
-const GEOGRAPHY_QUESTIONS_EN: [TriviaQuestion; 32] = [
+const GEOGRAPHY_QUESTIONS_EN: [TriviaQuestion; 52] = [
     TriviaQuestion { question: "What is the capital of Spain?", options: ["Barcelona", "Madrid", "Seville", "Valencia"], correct: 1 },
     TriviaQuestion { question: "Which river flows through Seville?", options: ["The Ebro", "The Duero", "The Guadalquivir", "The Tagus"], correct: 2 },
     TriviaQuestion { question: "What is the longest river in Spain?", options: ["The Ebro", "The Guadalquivir", "The Duero", "The Tagus"], correct: 3 },
@@ -687,6 +707,26 @@ const GEOGRAPHY_QUESTIONS_EN: [TriviaQuestion; 32] = [
     TriviaQuestion { question: "What is the capital of Navarre?", options: ["San Sebastián", "Vitoria", "Logroño", "Pamplona"], correct: 3 },
     TriviaQuestion { question: "Which islands are in the Mediterranean Sea?", options: ["The Canary Islands", "The Balearic Islands", "The Azores", "The Cíes Islands"], correct: 1 },
     TriviaQuestion { question: "What is the capital of the Basque Country?", options: ["Bilbao", "San Sebastián", "Vitoria-Gasteiz", "Logroño"], correct: 2 },
+    TriviaQuestion { question: "In which city is the Alhambra?", options: ["Granada", "Seville", "Cordoba", "Jaén"], correct: 0 },
+    TriviaQuestion { question: "Which country borders Spain to the north?", options: ["Portugal", "Andorra", "France", "Morocco"], correct: 2 },
+    TriviaQuestion { question: "Which is the largest Canary Island?", options: ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura"], correct: 0 },
+    TriviaQuestion { question: "Which river is the largest in Spain by volume?", options: ["Tagus", "Ebro", "Duero", "Guadalquivir"], correct: 1 },
+    TriviaQuestion { question: "In which province is the Costa del Sol?", options: ["Malaga", "Almeria", "Cadiz", "Huelva"], correct: 0 },
+    TriviaQuestion { question: "What is the capital of the province of Lleida?", options: ["Lleida", "Tarragona", "Girona", "Barcelona"], correct: 0 },
+    TriviaQuestion { question: "Which sea bathes the Balearic Islands?", options: ["Cantabrian", "Mediterranean", "Atlantic", "Black"], correct: 1 },
+    TriviaQuestion { question: "In which community is Teide?", options: ["Andalusia", "Canary Islands", "Balearic Islands", "Valencia"], correct: 1 },
+    TriviaQuestion { question: "Which is the smallest province in Spain?", options: ["Guipúzcoa", "Vizcaya", "Cantabria", "Álava"], correct: 0 },
+    TriviaQuestion { question: "Which city has the famous Mosque?", options: ["Seville", "Granada", "Cordoba", "Toledo"], correct: 2 },
+    TriviaQuestion { question: "On which island is Teide?", options: ["Tenerife", "Gran Canaria", "La Palma", "El Hierro"], correct: 0 },
+    TriviaQuestion { question: "What is the capital of Huelva?", options: ["Huelva", "Seville", "Malaga", "Cadiz"], correct: 0 },
+    TriviaQuestion { question: "Which province is famous for paella?", options: ["Valencia", "Alicante", "Castellón", "Murcia"], correct: 0 },
+    TriviaQuestion { question: "In which community is Doñana?", options: ["Extremadura", "Andalusia", "Murcia", "Valencia"], correct: 1 },
+    TriviaQuestion { question: "Which city is on the Costa Brava?", options: ["Girona", "Barcelona", "Tarragona", "Lleida"], correct: 0 },
+    TriviaQuestion { question: "What is the capital of Teruel?", options: ["Teruel", "Huesca", "Zaragoza", "Lleida"], correct: 0 },
+    TriviaQuestion { question: "Which river flows through Salamanca?", options: ["Duero", "Tormes", "Tagus", "Ebro"], correct: 1 },
+    TriviaQuestion { question: "In which community is Ribeira Sacra?", options: ["Asturias", "Cantabria", "Galicia", "Basque Country"], correct: 2 },
+    TriviaQuestion { question: "Which is the most famous beach in San Sebastián?", options: ["La Concha", "Ondarreta", "Zurriola", "Malvarrosa"], correct: 0 },
+    TriviaQuestion { question: "Which islands form Cabrera?", options: ["Balearic", "Canary", "Azores", "Cíes"], correct: 0 },
 ];
 
 /// Preguntas de ciencias naturales en francés.
@@ -724,7 +764,7 @@ const SCIENCE_QUESTIONS_FR: [TriviaQuestion; 30] = [
 ];
 
 /// Preguntas de geografía de España en francés.
-const GEOGRAPHY_QUESTIONS_FR: [TriviaQuestion; 32] = [
+const GEOGRAPHY_QUESTIONS_FR: [TriviaQuestion; 52] = [
     TriviaQuestion { question: "Quelle est la capitale de l'Espagne ?", options: ["Barcelone", "Madrid", "Séville", "Valence"], correct: 1 },
     TriviaQuestion { question: "Quel fleuve traverse Séville ?", options: ["L'Èbre", "Le Duero", "Le Guadalquivir", "Le Tage"], correct: 2 },
     TriviaQuestion { question: "Quel est le plus long fleuve d'Espagne ?", options: ["L'Èbre", "Le Guadalquivir", "Le Duero", "Le Tage"], correct: 3 },
@@ -757,6 +797,26 @@ const GEOGRAPHY_QUESTIONS_FR: [TriviaQuestion; 32] = [
     TriviaQuestion { question: "Quelle est la capitale de la Navarre ?", options: ["Saint-Sébastien", "Vitoria", "Logroño", "Pampelune"], correct: 3 },
     TriviaQuestion { question: "Quelles îles se trouvent en mer Méditerranée ?", options: ["Les Canaries", "Les Baléares", "Les Açores", "Les îles Cíes"], correct: 1 },
     TriviaQuestion { question: "Quelle est la capitale du Pays basque ?", options: ["Bilbao", "Saint-Sébastien", "Vitoria-Gasteiz", "Logroño"], correct: 2 },
+    TriviaQuestion { question: "Dans quelle ville se trouve l'Alhambra ?", options: ["Grenade", "Séville", "Cordoue", "Jaén"], correct: 0 },
+    TriviaQuestion { question: "Quel pays limite l'Espagne au nord ?", options: ["Portugal", "Andorre", "France", "Maroc"], correct: 2 },
+    TriviaQuestion { question: "Quelle est la plus grande île des Canaries ?", options: ["Tenerife", "Grande Canarie", "Lanzarote", "Fuerteventura"], correct: 0 },
+    TriviaQuestion { question: "Quel fleuve a le plus grand débit en Espagne ?", options: ["Tage", "Èbre", "Duero", "Guadalquivir"], correct: 1 },
+    TriviaQuestion { question: "Dans quelle province se trouve la Costa del Sol ?", options: ["Malaga", "Almería", "Cadix", "Huelva"], correct: 0 },
+    TriviaQuestion { question: "Quelle est la capitale de la province de Lérida ?", options: ["Lérida", "Tarragone", "Gérone", "Barcelone"], correct: 0 },
+    TriviaQuestion { question: "Quelle mer baigne les Baléares ?", options: ["Cantabrique", "Méditerranée", "Atlantique", "Noire"], correct: 1 },
+    TriviaQuestion { question: "Dans quelle communauté se trouve le Teide ?", options: ["Andalousie", "Canaries", "Baléares", "Valence"], correct: 1 },
+    TriviaQuestion { question: "Quelle est la plus petite province d'Espagne ?", options: ["Guipuscoa", "Biscaye", "Cantabrie", "Alava"], correct: 0 },
+    TriviaQuestion { question: "Quelle ville a la célèbre Mosquée ?", options: ["Séville", "Grenade", "Cordoue", "Tolède"], correct: 2 },
+    TriviaQuestion { question: "Sur quelle île se trouve le Teide ?", options: ["Tenerife", "Grande Canarie", "La Palma", "El Hierro"], correct: 0 },
+    TriviaQuestion { question: "Quelle est la capitale de Huelva ?", options: ["Huelva", "Séville", "Malaga", "Cadix"], correct: 0 },
+    TriviaQuestion { question: "Quelle province est célèbre pour la paella ?", options: ["Valence", "Alicante", "Castellón", "Murcie"], correct: 0 },
+    TriviaQuestion { question: "Dans quelle communauté se trouve Doñana ?", options: ["Estrémadure", "Andalousie", "Murcie", "Valence"], correct: 1 },
+    TriviaQuestion { question: "Quelle ville est sur la Costa Brava ?", options: ["Gérone", "Barcelone", "Tarragone", "Lérida"], correct: 0 },
+    TriviaQuestion { question: "Quelle est la capitale de Teruel ?", options: ["Teruel", "Huesca", "Saragosse", "Lérida"], correct: 0 },
+    TriviaQuestion { question: "Quel fleuve traverse Salamanque ?", options: ["Duero", "Tormes", "Tage", "Èbre"], correct: 1 },
+    TriviaQuestion { question: "Dans quelle communauté se trouve la Ribeira Sacra ?", options: ["Asturies", "Cantabrie", "Galice", "Pays basque"], correct: 2 },
+    TriviaQuestion { question: "Quelle est la plage la plus célèbre de Saint-Sébastien ?", options: ["La Concha", "Ondarreta", "Zurriola", "Malvarrosa"], correct: 0 },
+    TriviaQuestion { question: "Quelles îles forment Cabrera ?", options: ["Baléares", "Canaries", "Açores", "Cíes"], correct: 0 },
 ];
 
 /// Cuerpo humano — ES

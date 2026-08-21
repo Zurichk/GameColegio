@@ -13,14 +13,14 @@ rand = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-# getrandom SOLO para WASM — rand 0.8 usa getrandom 0.2 que en wasm debe
-# usar el backend `js` (si no, falla en runtime con Table.grow).
-# Se deja SOLO en wasm32 para no romper el build nativo en Windows con el
-# MinGW viejo (dlltool). En nativo Bevy usa el backend windows nativo.
-# Nota: getrandom 0.3 (usado por Bevy vía uuid) se arregla vía RUSTFLAGS
-# `getrandom_backend="wasm_js"` en el Dockerfile, no hace falta aquí.
+# Parche WASM Table.grow — getrandom tiene 3 majors en el árbol (0.2 vía rand,
+# 0.3 y 0.4 vía Bevy/uuid). En wasm32 todas deben usar backend JS.
+# Se usa alias (package = "getrandom") para que los features se unifiquen con
+# las dependencias transitivas sin romper el build nativo en Windows (MinGW).
 [target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.2", features = ["js"] }
+getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
+getrandom_03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
+getrandom_04 = { package = "getrandom", version = "0.4", features = ["wasm_js"] }
 
 # Perfil de release optimizado para la compilación WebAssembly (Docker/Coolify):
 # - opt-level 2 compila mucho más rápido que 3 (Bevy es enorme) con una

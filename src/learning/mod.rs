@@ -17,6 +17,7 @@ pub mod anagram;
 pub mod compare;
 pub mod fractions;
 pub mod geometry;
+pub mod guess_number;
 pub mod hangman;
 pub mod math;
 pub mod memory;
@@ -27,6 +28,7 @@ pub mod sequence;
 pub mod spelling;
 pub mod synonyms;
 pub mod trivia;
+pub mod vocab;
 pub mod word_problems;
 
 use bevy::prelude::*;
@@ -45,12 +47,18 @@ impl Plugin for LearningPlugin {
             hangman::HangmanPlugin,
             synonyms::SynonymPlugin,
             anagram::AnagramPlugin,
+        ));
+        app.add_plugins((
+            vocab::VocabPlugin,
             math::MathPlugin,
             mental::MentalPlugin,
             compare::ComparePlugin,
             fractions::FractionsPlugin,
             geometry::GeometryPlugin,
+        ));
+        app.add_plugins((
             word_problems::WordProblemsPlugin,
+            guess_number::GuessNumberPlugin,
             trivia::TriviaPlugin,
             memory::MemoryPlugin,
             sequence::SequencePlugin,
