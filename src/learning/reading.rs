@@ -140,8 +140,8 @@ impl Plugin for ReadingPlugin {
 /// Letras de las opciones.
 const OPTION_LETTERS: [char; 4] = ['A', 'B', 'C', 'D'];
 
-/// Banco de palabras con su pista (para lectura y escritura).
-const WORDS: [(&str, &str); 34] = [
+/// Banco de palabras con su pista (para lectura y escritura) — 60 palabras.
+const WORDS: [(&str, &str); 60] = [
     ("casa", "Lugar donde vives"),
     ("sol", "Brilla en el cielo por el día"),
     ("luna", "Se ve en el cielo por la noche"),
@@ -176,10 +176,36 @@ const WORDS: [(&str, &str); 34] = [
     ("tigre", "Felino con rayas"),
     ("jirafa", "Animal con el cuello largo"),
     ("elefante", "Animal grande con trompa"),
+    ("escuela", "Lugar donde aprendes"),
+    ("mochila", "Lleva tus libros al colegio"),
+    ("pizarra", "Donde escribe el profesor"),
+    ("profesor", "Enseña en el colegio"),
+    ("familia", "Padres, hijos y abuelos"),
+    ("amigo", "Persona que te quiere bien"),
+    ("ciudad", "Lugar con muchas casas y calles"),
+    ("pueblo", "Lugar pequeño con pocas calles"),
+    ("montaña", "Elevación grande de tierra"),
+    ("río", "Agua que corre hacia el mar"),
+    ("bosque", "Lugar con muchos árboles"),
+    ("jardín", "Lugar con flores y plantas"),
+    ("estrella", "Brilla en el cielo por la noche"),
+    ("avión", "Vuela por el cielo con pasajeros"),
+    ("tren", "Va por vías y lleva gente"),
+    ("coche", "Tiene cuatro ruedas y motor"),
+    ("barco", "Navega por el mar"),
+    ("bicicleta", "Tiene dos ruedas y pedales"),
+    ("manzana", "Fruta roja o verde"),
+    ("naranja", "Fruta redonda y naranja"),
+    ("plátano", "Fruta amarilla y alargada"),
+    ("fresa", "Fruta roja y pequeña"),
+    ("chocolate", "Dulce marrón que gusta mucho"),
+    ("helado", "Postre frío de verano"),
+    ("camino", "Sendero por donde se anda"),
+    ("puente", "Cruza sobre el río o la calle"),
 ];
 
-/// Banco de palabras en inglés (palabra, pista).
-const WORDS_EN: [(&str, &str); 34] = [
+/// Banco de palabras en inglés — 60 palabras.
+const WORDS_EN: [(&str, &str); 60] = [
     ("house", "Where you live"),
     ("sun", "It shines in the sky during the day"),
     ("moon", "You can see it in the sky at night"),
@@ -214,10 +240,36 @@ const WORDS_EN: [(&str, &str); 34] = [
     ("tiger", "A cat with stripes"),
     ("giraffe", "An animal with a long neck"),
     ("elephant", "A big animal with a trunk"),
+    ("school", "Where you learn"),
+    ("backpack", "Carries your books to school"),
+    ("blackboard", "Where the teacher writes"),
+    ("teacher", "Teaches at school"),
+    ("family", "Parents, children and grandparents"),
+    ("friend", "Someone who cares about you"),
+    ("city", "Place with many houses and streets"),
+    ("village", "Small place with few streets"),
+    ("mountain", "Big elevation of land"),
+    ("river", "Water running to the sea"),
+    ("forest", "Place with many trees"),
+    ("garden", "Place with flowers and plants"),
+    ("star", "Shines in the sky at night"),
+    ("plane", "Flies in the sky with passengers"),
+    ("train", "Goes on tracks and carries people"),
+    ("car", "Has four wheels and an engine"),
+    ("boat", "Sails on the sea"),
+    ("bicycle", "Has two wheels and pedals"),
+    ("apple", "Red or green fruit"),
+    ("orange", "Round orange fruit"),
+    ("banana", "Yellow long fruit"),
+    ("strawberry", "Small red fruit"),
+    ("chocolate", "Brown sweet you love"),
+    ("ice cream", "Cold summer dessert"),
+    ("path", "Trail where you walk"),
+    ("bridge", "Crosses over river or road"),
 ];
 
-/// Banco de palabras en francés (palabra, piste).
-const WORDS_FR: [(&str, &str); 34] = [
+/// Banco de palabras en francés — 60 palabras.
+const WORDS_FR: [(&str, &str); 60] = [
     ("maison", "L'endroit où tu habites"),
     ("soleil", "Il brille dans le ciel le jour"),
     ("lune", "On la voit dans le ciel la nuit"),
@@ -252,6 +304,32 @@ const WORDS_FR: [(&str, &str); 34] = [
     ("tigre", "Un félin avec des rayures"),
     ("girafe", "Un animal avec un long cou"),
     ("éléphant", "Un grand animal avec une trompe"),
+    ("école", "L'endroit où tu apprends"),
+    ("sac à dos", "Porte tes livres à l'école"),
+    ("tableau", "Où le professeur écrit"),
+    ("professeur", "Enseigne à l'école"),
+    ("famille", "Parents, enfants et grands-parents"),
+    ("ami", "Personne qui t'aime bien"),
+    ("ville", "Lieu avec beaucoup de maisons et rues"),
+    ("village", "Petit lieu avec peu de rues"),
+    ("montagne", "Grande élévation de terre"),
+    ("rivière", "Eau qui coule vers la mer"),
+    ("forêt", "Lieu avec beaucoup d'arbres"),
+    ("jardin", "Lieu avec des fleurs et plantes"),
+    ("étoile", "Brille dans le ciel la nuit"),
+    ("avion", "Vole dans le ciel avec des passagers"),
+    ("train", "Va sur des rails et transporte des gens"),
+    ("voiture", "A quatre roues et un moteur"),
+    ("bateau", "Navigue sur la mer"),
+    ("vélo", "A deux roues et des pédales"),
+    ("pomme", "Fruit rouge ou vert"),
+    ("orange", "Fruit rond et orange"),
+    ("banane", "Fruit jaune et allongé"),
+    ("fraise", "Petit fruit rouge"),
+    ("chocolat", "Douceur marron que tu aimes"),
+    ("glace", "Dessert froid d'été"),
+    ("chemin", "Sentier où l'on marche"),
+    ("pont", "Traverse la rivière ou la route"),
 ];
 
 /// Crea un texto del campo indicado (con su etiqueta).

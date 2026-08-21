@@ -63,6 +63,14 @@ pub struct SpellingButton;
 #[derive(Component)]
 pub struct HangmanButton;
 
+/// Botón de sinónimos.
+#[derive(Component)]
+pub struct SynonymsButton;
+
+/// Botón de anagramas.
+#[derive(Component)]
+pub struct AnagramButton;
+
 /// Botón de volver a la zona de aprendizaje.
 #[derive(Component)]
 pub struct LanguageBackButton;
@@ -97,6 +105,18 @@ pub struct MentalButton;
 #[derive(Component)]
 pub struct CompareButton;
 
+/// Botón de fracciones.
+#[derive(Component)]
+pub struct FractionsButton;
+
+/// Botón de geometría.
+#[derive(Component)]
+pub struct GeometryButton;
+
+/// Botón de problemas.
+#[derive(Component)]
+pub struct WordProblemsButton;
+
 /// Botón de volver a la zona de aprendizaje.
 #[derive(Component)]
 pub struct MathBackButton;
@@ -114,6 +134,14 @@ pub struct ScienceButton;
 /// Botón de cuestionario de geografía de España.
 #[derive(Component)]
 pub struct GeographyButton;
+
+/// Botón de cuerpo humano.
+#[derive(Component)]
+pub struct HumanBodyButton;
+
+/// Botón de universo.
+#[derive(Component)]
+pub struct SpaceButton;
 
 /// Botón de volver a la zona de aprendizaje.
 #[derive(Component)]
@@ -144,6 +172,14 @@ pub struct MemoryShapesButton;
 /// Botón de parejas de palabras para leer.
 #[derive(Component)]
 pub struct MemoryWordsButton;
+
+/// Botón de parejas de colores.
+#[derive(Component)]
+pub struct MemoryColorsButton;
+
+/// Botón de parejas de banderas.
+#[derive(Component)]
+pub struct MemoryFlagsButton;
 
 /// Botón de jugar a la memoria de secuencia (repite la secuencia de colores).
 #[derive(Component)]
@@ -321,6 +357,8 @@ fn spawn_language_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Leer y escribir", ReadingButton, &font);
             spawn_button(root, "Ortografía", SpellingButton, &font);
             spawn_button(root, "Ahorcado", HangmanButton, &font);
+            spawn_button(root, "Sinónimos", SynonymsButton, &font);
+            spawn_button(root, "Anagramas", AnagramButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
                 ..default()
@@ -346,6 +384,8 @@ fn language_menu_input(
             Option<&ReadingButton>,
             Option<&SpellingButton>,
             Option<&HangmanButton>,
+            Option<&SynonymsButton>,
+            Option<&AnagramButton>,
             Option<&LanguageBackButton>,
         ),
         Changed<Interaction>,
@@ -355,7 +395,7 @@ fn language_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, reading, spelling, hangman, back) in &interactions {
+    for (interaction, reading, spelling, hangman, synonyms, anagram, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -365,6 +405,10 @@ fn language_menu_input(
             next_state.set(GameState::SpellingPractice);
         } else if hangman.is_some() {
             next_state.set(GameState::HangmanGame);
+        } else if synonyms.is_some() {
+            next_state.set(GameState::SynonymsPractice);
+        } else if anagram.is_some() {
+            next_state.set(GameState::AnagramPractice);
         } else if back.is_some() {
             next_state.set(GameState::LearningMenu);
         }
@@ -412,6 +456,9 @@ fn spawn_math_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Dividir", DivButton, &font);
             spawn_button(root, "Cálculo mental", MentalButton, &font);
             spawn_button(root, "Mayor, menor o igual", CompareButton, &font);
+            spawn_button(root, "Fracciones", FractionsButton, &font);
+            spawn_button(root, "Geometría", GeometryButton, &font);
+            spawn_button(root, "Problemas", WordProblemsButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
                 ..default()
@@ -441,6 +488,9 @@ fn math_menu_input(
             Option<&DivButton>,
             Option<&MentalButton>,
             Option<&CompareButton>,
+            Option<&FractionsButton>,
+            Option<&GeometryButton>,
+            Option<&WordProblemsButton>,
             Option<&MathBackButton>,
         ),
         Changed<Interaction>,
@@ -450,7 +500,7 @@ fn math_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, add, sub, mul, div, mental, compare, back) in &interactions {
+    for (interaction, add, sub, mul, div, mental, compare, fractions, geometry, problems, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -470,6 +520,12 @@ fn math_menu_input(
             next_state.set(GameState::MentalPractice);
         } else if compare.is_some() {
             next_state.set(GameState::ComparePractice);
+        } else if fractions.is_some() {
+            next_state.set(GameState::FractionsPractice);
+        } else if geometry.is_some() {
+            next_state.set(GameState::GeometryPractice);
+        } else if problems.is_some() {
+            next_state.set(GameState::WordProblemsPractice);
         } else if back.is_some() {
             next_state.set(GameState::LearningMenu);
         }
@@ -512,6 +568,8 @@ fn spawn_science_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..default()
             });
             spawn_button(root, "Ciencias naturales", ScienceButton, &font);
+            spawn_button(root, "Cuerpo humano", HumanBodyButton, &font);
+            spawn_button(root, "Universo", SpaceButton, &font);
             spawn_button(root, "Geografía de España", GeographyButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
@@ -538,6 +596,8 @@ fn science_menu_input(
             &Interaction,
             Option<&ScienceButton>,
             Option<&GeographyButton>,
+            Option<&HumanBodyButton>,
+            Option<&SpaceButton>,
             Option<&ScienceBackButton>,
         ),
         Changed<Interaction>,
@@ -547,7 +607,7 @@ fn science_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, science, geography, back) in &interactions {
+    for (interaction, science, geography, human, space, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -557,6 +617,12 @@ fn science_menu_input(
         } else if geography.is_some() {
             commands.insert_resource(TriviaKind::Geography);
             next_state.set(GameState::GeographyPractice);
+        } else if human.is_some() {
+            commands.insert_resource(TriviaKind::HumanBody);
+            next_state.set(GameState::SciencePractice);
+        } else if space.is_some() {
+            commands.insert_resource(TriviaKind::Space);
+            next_state.set(GameState::SciencePractice);
         } else if back.is_some() {
             next_state.set(GameState::LearningMenu);
         }
@@ -603,6 +669,8 @@ fn spawn_memory_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Parejas mixtas (10)", MemoryMixedButton, &font);
             spawn_button(root, "Parejas de formas (8)", MemoryShapesButton, &font);
             spawn_button(root, "Parejas de palabras (6)", MemoryWordsButton, &font);
+            spawn_button(root, "Parejas de colores (6)", MemoryColorsButton, &font);
+            spawn_button(root, "Parejas de banderas (8)", MemoryFlagsButton, &font);
             spawn_button(root, "Memoria de secuencia", MemorySequenceButton, &font);
             root.spawn(Node {
                 height: Val::Px(14.0),
@@ -632,6 +700,8 @@ fn memory_menu_input(
             Option<&MemoryMixedButton>,
             Option<&MemoryShapesButton>,
             Option<&MemoryWordsButton>,
+            Option<&MemoryColorsButton>,
+            Option<&MemoryFlagsButton>,
             Option<&MemorySequenceButton>,
             Option<&MemoryBackButton>,
         ),
@@ -649,6 +719,8 @@ fn memory_menu_input(
         mixed,
         shapes,
         words,
+        colors,
+        flags,
         sequence,
         back,
     ) in &interactions
@@ -684,6 +756,18 @@ fn memory_menu_input(
             commands.insert_resource(MemoryConfig {
                 kind: MemoryKind::Words,
                 pairs: 6,
+            });
+            next_state.set(GameState::MemoryGame);
+        } else if colors.is_some() {
+            commands.insert_resource(MemoryConfig {
+                kind: MemoryKind::Colors,
+                pairs: 6,
+            });
+            next_state.set(GameState::MemoryGame);
+        } else if flags.is_some() {
+            commands.insert_resource(MemoryConfig {
+                kind: MemoryKind::Flags,
+                pairs: 8,
             });
             next_state.set(GameState::MemoryGame);
         } else if sequence.is_some() {

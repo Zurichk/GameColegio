@@ -23,6 +23,8 @@ const FEEDBACK_SECONDS: f32 = 1.4;
 pub enum TriviaKind {
     Science,
     Geography,
+    HumanBody,
+    Space,
 }
 
 impl TriviaKind {
@@ -31,6 +33,8 @@ impl TriviaKind {
         match self {
             TriviaKind::Science => "CIENCIAS NATURALES",
             TriviaKind::Geography => "GEOGRAFÍA DE ESPAÑA",
+            TriviaKind::HumanBody => "CUERPO HUMANO",
+            TriviaKind::Space => "UNIVERSO",
         }
     }
 }
@@ -281,6 +285,8 @@ fn build_rounds(kind: TriviaKind) -> Vec<TriviaQuestion> {
     let bank: &[TriviaQuestion] = match kind {
         TriviaKind::Science => science_bank(),
         TriviaKind::Geography => geography_bank(),
+        TriviaKind::HumanBody => human_body_bank(),
+        TriviaKind::Space => space_bank(),
     };
     let mut rng = rand::thread_rng();
     let mut picked: Vec<TriviaQuestion> = bank.choose_multiple(&mut rng, ROUNDS).copied().collect();
@@ -303,6 +309,24 @@ fn geography_bank() -> &'static [TriviaQuestion] {
         crate::i18n::Language::En => &GEOGRAPHY_QUESTIONS_EN,
         crate::i18n::Language::Fr => &GEOGRAPHY_QUESTIONS_FR,
         crate::i18n::Language::Es => &GEOGRAPHY_QUESTIONS,
+    }
+}
+
+/// Banco de cuerpo humano según el idioma activo.
+fn human_body_bank() -> &'static [TriviaQuestion] {
+    match crate::i18n::language() {
+        crate::i18n::Language::En => &HUMAN_BODY_QUESTIONS_EN,
+        crate::i18n::Language::Fr => &HUMAN_BODY_QUESTIONS_FR,
+        crate::i18n::Language::Es => &HUMAN_BODY_QUESTIONS,
+    }
+}
+
+/// Banco de universo según el idioma activo.
+fn space_bank() -> &'static [TriviaQuestion] {
+    match crate::i18n::language() {
+        crate::i18n::Language::En => &SPACE_QUESTIONS_EN,
+        crate::i18n::Language::Fr => &SPACE_QUESTIONS_FR,
+        crate::i18n::Language::Es => &SPACE_QUESTIONS,
     }
 }
 
@@ -733,4 +757,139 @@ const GEOGRAPHY_QUESTIONS_FR: [TriviaQuestion; 32] = [
     TriviaQuestion { question: "Quelle est la capitale de la Navarre ?", options: ["Saint-Sébastien", "Vitoria", "Logroño", "Pampelune"], correct: 3 },
     TriviaQuestion { question: "Quelles îles se trouvent en mer Méditerranée ?", options: ["Les Canaries", "Les Baléares", "Les Açores", "Les îles Cíes"], correct: 1 },
     TriviaQuestion { question: "Quelle est la capitale du Pays basque ?", options: ["Bilbao", "Saint-Sébastien", "Vitoria-Gasteiz", "Logroño"], correct: 2 },
+];
+
+/// Cuerpo humano — ES
+const HUMAN_BODY_QUESTIONS: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "¿Cuántos huesos tiene el cuerpo humano adulto?", options: ["206", "196", "216", "186"], correct: 0 },
+    TriviaQuestion { question: "¿Qué órgano bombea la sangre?", options: ["Cerebro", "Pulmón", "Corazón", "Hígado"], correct: 2 },
+    TriviaQuestion { question: "¿Con qué órgano pensamos?", options: ["Corazón", "Cerebro", "Pulmón", "Estómago"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántos dientes tiene un adulto?", options: ["28", "30", "32", "34"], correct: 2 },
+    TriviaQuestion { question: "¿Qué hueso protege el cerebro?", options: ["Fémur", "Cráneo", "Tibia", "Costilla"], correct: 1 },
+    TriviaQuestion { question: "¿Con qué respiramos?", options: ["Pulmones", "Corazón", "Riñones", "Hígado"], correct: 0 },
+    TriviaQuestion { question: "¿Cuántos pulmones tenemos?", options: ["1", "2", "3", "4"], correct: 1 },
+    TriviaQuestion { question: "¿Qué órgano filtra la sangre?", options: ["Corazón", "Pulmón", "Riñón", "Estómago"], correct: 2 },
+    TriviaQuestion { question: "¿Cómo se llama el hueso más largo?", options: ["Cráneo", "Fémur", "Tibia", "Húmero"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántas cámaras tiene el corazón?", options: ["2", "3", "4", "5"], correct: 2 },
+    TriviaQuestion { question: "¿Qué transporta el oxígeno en la sangre?", options: ["Plaquetas", "Glóbulos rojos", "Plasma", "Glóbulos blancos"], correct: 1 },
+    TriviaQuestion { question: "¿Con qué vemos?", options: ["Oídos", "Ojos", "Nariz", "Piel"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántos sentidos tenemos?", options: ["3", "4", "5", "6"], correct: 2 },
+    TriviaQuestion { question: "¿Qué órgano digiere los alimentos?", options: ["Corazón", "Estómago", "Pulmón", "Cerebro"], correct: 1 },
+    TriviaQuestion { question: "¿Dónde se produce la insulina?", options: ["Hígado", "Páncreas", "Riñón", "Pulmón"], correct: 1 },
+    TriviaQuestion { question: "¿Qué músculo nunca deja de latir?", options: ["Bíceps", "Corazón", "Cuádriceps", "Diafragma"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántas vértebras tiene la columna?", options: ["24", "33", "30", "26"], correct: 1 },
+    TriviaQuestion { question: "¿Qué órgano oye?", options: ["Ojo", "Oído", "Nariz", "Piel"], correct: 1 },
+    TriviaQuestion { question: "¿Qué líquido lleva nutrientes?", options: ["Bilis", "Sangre", "Saliva", "Moco"], correct: 1 },
+    TriviaQuestion { question: "¿Con qué órgano olemos?", options: ["Boca", "Nariz", "Ojos", "Oídos"], correct: 1 },
+];
+const HUMAN_BODY_QUESTIONS_EN: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "How many bones does an adult human have?", options: ["206", "196", "216", "186"], correct: 0 },
+    TriviaQuestion { question: "Which organ pumps blood?", options: ["Brain", "Lung", "Heart", "Liver"], correct: 2 },
+    TriviaQuestion { question: "With which organ do we think?", options: ["Heart", "Brain", "Lung", "Stomach"], correct: 1 },
+    TriviaQuestion { question: "How many teeth does an adult have?", options: ["28", "30", "32", "34"], correct: 2 },
+    TriviaQuestion { question: "Which bone protects the brain?", options: ["Femur", "Skull", "Tibia", "Rib"], correct: 1 },
+    TriviaQuestion { question: "With what do we breathe?", options: ["Lungs", "Heart", "Kidneys", "Liver"], correct: 0 },
+    TriviaQuestion { question: "How many lungs do we have?", options: ["1", "2", "3", "4"], correct: 1 },
+    TriviaQuestion { question: "Which organ filters blood?", options: ["Heart", "Lung", "Kidney", "Stomach"], correct: 2 },
+    TriviaQuestion { question: "What is the longest bone called?", options: ["Skull", "Femur", "Tibia", "Humerus"], correct: 1 },
+    TriviaQuestion { question: "How many chambers does the heart have?", options: ["2", "3", "4", "5"], correct: 2 },
+    TriviaQuestion { question: "What carries oxygen in blood?", options: ["Platelets", "Red blood cells", "Plasma", "White cells"], correct: 1 },
+    TriviaQuestion { question: "With what do we see?", options: ["Ears", "Eyes", "Nose", "Skin"], correct: 1 },
+    TriviaQuestion { question: "How many senses do we have?", options: ["3", "4", "5", "6"], correct: 2 },
+    TriviaQuestion { question: "Which organ digests food?", options: ["Heart", "Stomach", "Lung", "Brain"], correct: 1 },
+    TriviaQuestion { question: "Where is insulin produced?", options: ["Liver", "Pancreas", "Kidney", "Lung"], correct: 1 },
+    TriviaQuestion { question: "Which muscle never stops beating?", options: ["Biceps", "Heart", "Quadriceps", "Diaphragm"], correct: 1 },
+    TriviaQuestion { question: "How many vertebrae in the spine?", options: ["24", "33", "30", "26"], correct: 1 },
+    TriviaQuestion { question: "Which organ hears?", options: ["Eye", "Ear", "Nose", "Skin"], correct: 1 },
+    TriviaQuestion { question: "Which liquid carries nutrients?", options: ["Bile", "Blood", "Saliva", "Mucus"], correct: 1 },
+    TriviaQuestion { question: "With which organ do we smell?", options: ["Mouth", "Nose", "Eyes", "Ears"], correct: 1 },
+];
+const HUMAN_BODY_QUESTIONS_FR: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "Combien d'os a un adulte ?", options: ["206", "196", "216", "186"], correct: 0 },
+    TriviaQuestion { question: "Quel organe pompe le sang ?", options: ["Cerveau", "Poumon", "Cœur", "Foie"], correct: 2 },
+    TriviaQuestion { question: "Avec quel organe pensons-nous ?", options: ["Cœur", "Cerveau", "Poumon", "Estomac"], correct: 1 },
+    TriviaQuestion { question: "Combien de dents a un adulte ?", options: ["28", "30", "32", "34"], correct: 2 },
+    TriviaQuestion { question: "Quel os protège le cerveau ?", options: ["Fémur", "Crâne", "Tibia", "Côte"], correct: 1 },
+    TriviaQuestion { question: "Avec quoi respirons-nous ?", options: ["Poumons", "Cœur", "Reins", "Foie"], correct: 0 },
+    TriviaQuestion { question: "Combien de poumons avons-nous ?", options: ["1", "2", "3", "4"], correct: 1 },
+    TriviaQuestion { question: "Quel organe filtre le sang ?", options: ["Cœur", "Poumon", "Rein", "Estomac"], correct: 2 },
+    TriviaQuestion { question: "Comment s'appelle l'os le plus long ?", options: ["Crâne", "Fémur", "Tibia", "Humérus"], correct: 1 },
+    TriviaQuestion { question: "Combien de cavités a le cœur ?", options: ["2", "3", "4", "5"], correct: 2 },
+    TriviaQuestion { question: "Qu'est-ce qui transporte l'oxygène ?", options: ["Plaquettes", "Globules rouges", "Plasma", "Globules blancs"], correct: 1 },
+    TriviaQuestion { question: "Avec quoi voyons-nous ?", options: ["Oreilles", "Yeux", "Nez", "Peau"], correct: 1 },
+    TriviaQuestion { question: "Combien de sens avons-nous ?", options: ["3", "4", "5", "6"], correct: 2 },
+    TriviaQuestion { question: "Quel organe digère ?", options: ["Cœur", "Estomac", "Poumon", "Cerveau"], correct: 1 },
+    TriviaQuestion { question: "Où est produite l'insuline ?", options: ["Foie", "Pancréas", "Rein", "Poumon"], correct: 1 },
+    TriviaQuestion { question: "Quel muscle ne s'arrête jamais ?", options: ["Biceps", "Cœur", "Quadriceps", "Diaphragme"], correct: 1 },
+    TriviaQuestion { question: "Combien de vertèbres dans la colonne ?", options: ["24", "33", "30", "26"], correct: 1 },
+    TriviaQuestion { question: "Quel organe entend ?", options: ["Œil", "Oreille", "Nez", "Peau"], correct: 1 },
+    TriviaQuestion { question: "Quel liquide porte les nutriments ?", options: ["Bile", "Sang", "Salive", "Mucus"], correct: 1 },
+    TriviaQuestion { question: "Avec quel organe sentons-nous ?", options: ["Bouche", "Nez", "Yeux", "Oreilles"], correct: 1 },
+];
+/// Universo — ES
+const SPACE_QUESTIONS: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "¿Qué planeta es el más cercano al Sol?", options: ["Venus", "Mercurio", "Marte", "Tierra"], correct: 1 },
+    TriviaQuestion { question: "¿Qué planeta es el más grande?", options: ["Tierra", "Júpiter", "Saturno", "Marte"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántos planetas tiene el sistema solar?", options: ["7", "8", "9", "10"], correct: 1 },
+    TriviaQuestion { question: "¿Qué satélite orbita la Tierra?", options: ["Sol", "Luna", "Marte", "Venus"], correct: 1 },
+    TriviaQuestion { question: "¿Qué estrella nos da luz y calor?", options: ["Luna", "Sol", "Sirio", "Polar"], correct: 1 },
+    TriviaQuestion { question: "¿Qué planeta es el rojo?", options: ["Venus", "Marte", "Júpiter", "Mercurio"], correct: 1 },
+    TriviaQuestion { question: "¿Qué forma tiene la Tierra?", options: ["Plana", "Esférica", "Cúbica", "Triangular"], correct: 1 },
+    TriviaQuestion { question: "¿Qué planeta tiene anillos visibles?", options: ["Marte", "Júpiter", "Saturno", "Venus"], correct: 2 },
+    TriviaQuestion { question: "¿Cuánto tarda la Tierra en dar la vuelta al Sol?", options: ["24h", "30 días", "365 días", "7 días"], correct: 2 },
+    TriviaQuestion { question: "¿Cuánto tarda la Luna en dar la vuelta a la Tierra?", options: ["1 día", "7 días", "28 días", "365 días"], correct: 2 },
+    TriviaQuestion { question: "¿Qué planeta es el más frío?", options: ["Marte", "Júpiter", "Neptuno", "Venus"], correct: 2 },
+    TriviaQuestion { question: "¿Qué planeta es el más caliente?", options: ["Mercurio", "Venus", "Marte", "Júpiter"], correct: 1 },
+    TriviaQuestion { question: "¿Qué es la Vía Láctea?", options: ["Un planeta", "Una galaxia", "Una estrella", "Un satélite"], correct: 1 },
+    TriviaQuestion { question: "¿Qué fuerza nos mantiene en el suelo?", options: ["Magnetismo", "Gravedad", "Fricción", "Inercia"], correct: 1 },
+    TriviaQuestion { question: "¿Quién fue el primer humano en la Luna?", options: ["Gagarin", "Armstrong", "Aldrin", "Collins"], correct: 1 },
+    TriviaQuestion { question: "¿Cuántos continentes tiene la Tierra?", options: ["5", "6", "7", "8"], correct: 2 },
+    TriviaQuestion { question: "¿Qué planeta es azul?", options: ["Marte", "Tierra", "Neptuno", "Venus"], correct: 1 },
+    TriviaQuestion { question: "¿Qué instrumento se usa para ver estrellas?", options: ["Microscopio", "Telescopio", "Periscopio", "Prismático"], correct: 1 },
+    TriviaQuestion { question: "¿Qué planeta tiene una Gran Mancha Roja?", options: ["Marte", "Júpiter", "Saturno", "Venus"], correct: 1 },
+    TriviaQuestion { question: "¿Dónde flotan los astronautas?", options: ["En el mar", "En el espacio", "En el aire", "En la montaña"], correct: 1 },
+];
+const SPACE_QUESTIONS_EN: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "Which planet is closest to the Sun?", options: ["Venus", "Mercury", "Mars", "Earth"], correct: 1 },
+    TriviaQuestion { question: "Which is the biggest planet?", options: ["Earth", "Jupiter", "Saturn", "Mars"], correct: 1 },
+    TriviaQuestion { question: "How many planets in the solar system?", options: ["7", "8", "9", "10"], correct: 1 },
+    TriviaQuestion { question: "Which satellite orbits Earth?", options: ["Sun", "Moon", "Mars", "Venus"], correct: 1 },
+    TriviaQuestion { question: "Which star gives us light and heat?", options: ["Moon", "Sun", "Sirius", "Polaris"], correct: 1 },
+    TriviaQuestion { question: "Which is the red planet?", options: ["Venus", "Mars", "Jupiter", "Mercury"], correct: 1 },
+    TriviaQuestion { question: "What shape is Earth?", options: ["Flat", "Spherical", "Cubic", "Triangular"], correct: 1 },
+    TriviaQuestion { question: "Which planet has visible rings?", options: ["Mars", "Jupiter", "Saturn", "Venus"], correct: 2 },
+    TriviaQuestion { question: "How long for Earth to orbit the Sun?", options: ["24h", "30 days", "365 days", "7 days"], correct: 2 },
+    TriviaQuestion { question: "How long for Moon to orbit Earth?", options: ["1 day", "7 days", "28 days", "365 days"], correct: 2 },
+    TriviaQuestion { question: "Which is the coldest planet?", options: ["Mars", "Jupiter", "Neptune", "Venus"], correct: 2 },
+    TriviaQuestion { question: "Which is the hottest planet?", options: ["Mercury", "Venus", "Mars", "Jupiter"], correct: 1 },
+    TriviaQuestion { question: "What is the Milky Way?", options: ["A planet", "A galaxy", "A star", "A satellite"], correct: 1 },
+    TriviaQuestion { question: "Which force keeps us on the ground?", options: ["Magnetism", "Gravity", "Friction", "Inertia"], correct: 1 },
+    TriviaQuestion { question: "Who was first on the Moon?", options: ["Gagarin", "Armstrong", "Aldrin", "Collins"], correct: 1 },
+    TriviaQuestion { question: "How many continents does Earth have?", options: ["5", "6", "7", "8"], correct: 2 },
+    TriviaQuestion { question: "Which planet is blue?", options: ["Mars", "Earth", "Neptune", "Venus"], correct: 1 },
+    TriviaQuestion { question: "What instrument sees stars?", options: ["Microscope", "Telescope", "Periscope", "Binoculars"], correct: 1 },
+    TriviaQuestion { question: "Which planet has a Great Red Spot?", options: ["Mars", "Jupiter", "Saturn", "Venus"], correct: 1 },
+    TriviaQuestion { question: "Where do astronauts float?", options: ["In the sea", "In space", "In the air", "On the mountain"], correct: 1 },
+];
+const SPACE_QUESTIONS_FR: [TriviaQuestion; 20] = [
+    TriviaQuestion { question: "Quelle planète est la plus proche du Soleil ?", options: ["Vénus", "Mercure", "Mars", "Terre"], correct: 1 },
+    TriviaQuestion { question: "Quelle est la plus grande planète ?", options: ["Terre", "Jupiter", "Saturne", "Mars"], correct: 1 },
+    TriviaQuestion { question: "Combien de planètes dans le système solaire ?", options: ["7", "8", "9", "10"], correct: 1 },
+    TriviaQuestion { question: "Quel satellite orbite la Terre ?", options: ["Soleil", "Lune", "Mars", "Vénus"], correct: 1 },
+    TriviaQuestion { question: "Quelle étoile donne lumière et chaleur ?", options: ["Lune", "Soleil", "Sirius", "Polaire"], correct: 1 },
+    TriviaQuestion { question: "Quelle est la planète rouge ?", options: ["Vénus", "Mars", "Jupiter", "Mercure"], correct: 1 },
+    TriviaQuestion { question: "Quelle forme a la Terre ?", options: ["Plate", "Sphérique", "Cubique", "Triangulaire"], correct: 1 },
+    TriviaQuestion { question: "Quelle planète a des anneaux visibles ?", options: ["Mars", "Jupiter", "Saturne", "Vénus"], correct: 2 },
+    TriviaQuestion { question: "Combien de temps pour la Terre autour du Soleil ?", options: ["24h", "30 jours", "365 jours", "7 jours"], correct: 2 },
+    TriviaQuestion { question: "Combien de temps pour la Lune autour de la Terre ?", options: ["1 jour", "7 jours", "28 jours", "365 jours"], correct: 2 },
+    TriviaQuestion { question: "Quelle est la plus froide ?", options: ["Mars", "Jupiter", "Neptune", "Vénus"], correct: 2 },
+    TriviaQuestion { question: "Quelle est la plus chaude ?", options: ["Mercure", "Vénus", "Mars", "Jupiter"], correct: 1 },
+    TriviaQuestion { question: "Qu'est-ce que la Voie lactée ?", options: ["Une planète", "Une galaxie", "Une étoile", "Un satellite"], correct: 1 },
+    TriviaQuestion { question: "Quelle force nous maintient au sol ?", options: ["Magnétisme", "Gravité", "Friction", "Inertie"], correct: 1 },
+    TriviaQuestion { question: "Qui fut le premier sur la Lune ?", options: ["Gagarine", "Armstrong", "Aldrin", "Collins"], correct: 1 },
+    TriviaQuestion { question: "Combien de continents a la Terre ?", options: ["5", "6", "7", "8"], correct: 2 },
+    TriviaQuestion { question: "Quelle planète est bleue ?", options: ["Mars", "Terre", "Neptune", "Vénus"], correct: 1 },
+    TriviaQuestion { question: "Quel instrument voit les étoiles ?", options: ["Microscope", "Télescope", "Périscope", "Jumelles"], correct: 1 },
+    TriviaQuestion { question: "Quelle planète a une Grande Tache Rouge ?", options: ["Mars", "Jupiter", "Saturne", "Vénus"], correct: 1 },
+    TriviaQuestion { question: "Où flottent les astronautes ?", options: ["Dans la mer", "Dans l'espace", "Dans l'air", "Sur la montagne"], correct: 1 },
 ];

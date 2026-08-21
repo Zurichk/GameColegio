@@ -470,8 +470,8 @@ fn key_name(code: KeyCode) -> Option<char> {
 
 // ---- Banco de palabras -----------------------------------------------------
 
-/// Palabras del ahorcado con la pista de su categoría.
-const WORDS: [HangmanWord; 48] = [
+/// Palabras del ahorcado — 72 palabras.
+const WORDS: [HangmanWord; 72] = [
     // Animales
     HangmanWord { word: "perro", category: "Animal" },
     HangmanWord { word: "gato", category: "Animal" },
@@ -524,6 +524,33 @@ const WORDS: [HangmanWord; 48] = [
     HangmanWord { word: "luna", category: "Naturaleza" },
     HangmanWord { word: "viento", category: "Naturaleza" },
     HangmanWord { word: "lluvia", category: "Naturaleza" },
+    // Transporte
+    HangmanWord { word: "avión", category: "Transporte" },
+    HangmanWord { word: "tren", category: "Transporte" },
+    HangmanWord { word: "barco", category: "Transporte" },
+    HangmanWord { word: "bicicleta", category: "Transporte" },
+    HangmanWord { word: "autobús", category: "Transporte" },
+    HangmanWord { word: "camión", category: "Transporte" },
+    HangmanWord { word: "helicóptero", category: "Transporte" },
+    HangmanWord { word: "coche", category: "Transporte" },
+    // Casa
+    HangmanWord { word: "ventana", category: "Casa" },
+    HangmanWord { word: "puerta", category: "Casa" },
+    HangmanWord { word: "cocina", category: "Casa" },
+    HangmanWord { word: "espejo", category: "Casa" },
+    HangmanWord { word: "lámpara", category: "Casa" },
+    HangmanWord { word: "sofá", category: "Casa" },
+    HangmanWord { word: "cama", category: "Casa" },
+    HangmanWord { word: "silla", category: "Casa" },
+    // Ciudad
+    HangmanWord { word: "puente", category: "Ciudad" },
+    HangmanWord { word: "parque", category: "Ciudad" },
+    HangmanWord { word: "hospital", category: "Ciudad" },
+    HangmanWord { word: "escuela", category: "Ciudad" },
+    HangmanWord { word: "mercado", category: "Ciudad" },
+    HangmanWord { word: "plaza", category: "Ciudad" },
+    HangmanWord { word: "calle", category: "Ciudad" },
+    HangmanWord { word: "semáforo", category: "Ciudad" },
 ];
 
 /// Banco de palabras del ahorcado según el idioma activo.
@@ -535,8 +562,8 @@ fn words_bank() -> &'static [HangmanWord] {
     }
 }
 
-/// Palabras del ahorcado en inglés.
-const WORDS_EN: [HangmanWord; 48] = [
+/// Palabras del ahorcado en inglés — 72 palabras.
+const WORDS_EN: [HangmanWord; 72] = [
     // Animals
     HangmanWord { word: "dog", category: "Animal" },
     HangmanWord { word: "cat", category: "Animal" },
@@ -589,10 +616,37 @@ const WORDS_EN: [HangmanWord; 48] = [
     HangmanWord { word: "moon", category: "Nature" },
     HangmanWord { word: "wind", category: "Nature" },
     HangmanWord { word: "rain", category: "Nature" },
+    // Transport
+    HangmanWord { word: "plane", category: "Transport" },
+    HangmanWord { word: "train", category: "Transport" },
+    HangmanWord { word: "boat", category: "Transport" },
+    HangmanWord { word: "bicycle", category: "Transport" },
+    HangmanWord { word: "bus", category: "Transport" },
+    HangmanWord { word: "truck", category: "Transport" },
+    HangmanWord { word: "helicopter", category: "Transport" },
+    HangmanWord { word: "car", category: "Transport" },
+    // House
+    HangmanWord { word: "window", category: "House" },
+    HangmanWord { word: "door", category: "House" },
+    HangmanWord { word: "kitchen", category: "House" },
+    HangmanWord { word: "mirror", category: "House" },
+    HangmanWord { word: "lamp", category: "House" },
+    HangmanWord { word: "sofa", category: "House" },
+    HangmanWord { word: "bed", category: "House" },
+    HangmanWord { word: "chair", category: "House" },
+    // City
+    HangmanWord { word: "bridge", category: "City" },
+    HangmanWord { word: "park", category: "City" },
+    HangmanWord { word: "hospital", category: "City" },
+    HangmanWord { word: "school", category: "City" },
+    HangmanWord { word: "market", category: "City" },
+    HangmanWord { word: "square", category: "City" },
+    HangmanWord { word: "street", category: "City" },
+    HangmanWord { word: "traffic light", category: "City" },
 ];
 
-/// Palabras del ahorcado en francés.
-const WORDS_FR: [HangmanWord; 48] = [
+/// Palabras del ahorcado en francés — 72 palabras.
+const WORDS_FR: [HangmanWord; 72] = [
     // Animaux
     HangmanWord { word: "chien", category: "Animal" },
     HangmanWord { word: "chat", category: "Animal" },
@@ -645,4 +699,31 @@ const WORDS_FR: [HangmanWord; 48] = [
     HangmanWord { word: "lune", category: "Nature" },
     HangmanWord { word: "vent", category: "Nature" },
     HangmanWord { word: "pluie", category: "Nature" },
+    // Transport
+    HangmanWord { word: "avion", category: "Transport" },
+    HangmanWord { word: "train", category: "Transport" },
+    HangmanWord { word: "bateau", category: "Transport" },
+    HangmanWord { word: "vélo", category: "Transport" },
+    HangmanWord { word: "bus", category: "Transport" },
+    HangmanWord { word: "camion", category: "Transport" },
+    HangmanWord { word: "hélicoptère", category: "Transport" },
+    HangmanWord { word: "voiture", category: "Transport" },
+    // Maison
+    HangmanWord { word: "fenêtre", category: "Maison" },
+    HangmanWord { word: "porte", category: "Maison" },
+    HangmanWord { word: "cuisine", category: "Maison" },
+    HangmanWord { word: "miroir", category: "Maison" },
+    HangmanWord { word: "lampe", category: "Maison" },
+    HangmanWord { word: "canapé", category: "Maison" },
+    HangmanWord { word: "lit", category: "Maison" },
+    HangmanWord { word: "chaise", category: "Maison" },
+    // Ville
+    HangmanWord { word: "pont", category: "Ville" },
+    HangmanWord { word: "parc", category: "Ville" },
+    HangmanWord { word: "hôpital", category: "Ville" },
+    HangmanWord { word: "école", category: "Ville" },
+    HangmanWord { word: "marché", category: "Ville" },
+    HangmanWord { word: "place", category: "Ville" },
+    HangmanWord { word: "rue", category: "Ville" },
+    HangmanWord { word: "feu tricolore", category: "Ville" },
 ];

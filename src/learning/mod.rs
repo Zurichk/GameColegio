@@ -13,7 +13,10 @@
 //! tablero), por lo que no interfieren con la exploración 3D: los sistemas
 //! del mundo solo corren en `GameState::Playing`.
 
+pub mod anagram;
 pub mod compare;
+pub mod fractions;
+pub mod geometry;
 pub mod hangman;
 pub mod math;
 pub mod memory;
@@ -22,7 +25,9 @@ pub mod menu;
 pub mod reading;
 pub mod sequence;
 pub mod spelling;
+pub mod synonyms;
 pub mod trivia;
+pub mod word_problems;
 
 use bevy::prelude::*;
 
@@ -38,9 +43,14 @@ impl Plugin for LearningPlugin {
             reading::ReadingPlugin,
             spelling::SpellingPlugin,
             hangman::HangmanPlugin,
+            synonyms::SynonymPlugin,
+            anagram::AnagramPlugin,
             math::MathPlugin,
             mental::MentalPlugin,
             compare::ComparePlugin,
+            fractions::FractionsPlugin,
+            geometry::GeometryPlugin,
+            word_problems::WordProblemsPlugin,
             trivia::TriviaPlugin,
             memory::MemoryPlugin,
             sequence::SequencePlugin,

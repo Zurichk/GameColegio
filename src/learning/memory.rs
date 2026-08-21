@@ -29,6 +29,10 @@ pub enum MemoryKind {
     Shapes,
     /// Parejas de palabras para leer.
     Words,
+    /// Parejas de colores (círculos coloreados).
+    Colors,
+    /// Parejas de banderas (emoji banderas).
+    Flags,
 }
 
 impl MemoryKind {
@@ -40,6 +44,8 @@ impl MemoryKind {
             MemoryKind::Mixed => "Parejas mixtas",
             MemoryKind::Shapes => "Parejas de formas",
             MemoryKind::Words => "Parejas de palabras",
+            MemoryKind::Colors => "Parejas de colores",
+            MemoryKind::Flags => "Parejas de banderas",
         }
     }
 }
@@ -191,6 +197,17 @@ fn glyphs_for(kind: MemoryKind) -> Vec<String> {
             .collect(),
         // Palabras sencillas para leer (la cantidad la recorta el menú).
         MemoryKind::Words => words_bank()
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+        // Colores (círculo coloreado + nombre, el color se asigna por pareja).
+        MemoryKind::Colors => ["●", "●", "●", "●", "●", "●", "●", "●", "●", "●"]
+            .iter()
+            .enumerate()
+            .map(|(i, _)| format!("C{}", i + 1))
+            .collect(),
+        // Banderas (emoji, fallback a texto si la fuente no los tiene).
+        MemoryKind::Flags => ["🇪🇸", "🇫🇷", "🇬🇧", "🇩🇪", "🇮🇹", "🇵🇹", "🇺🇸", "🇯🇵", "🇲🇽", "🇦🇷"]
             .iter()
             .map(|s| s.to_string())
             .collect(),

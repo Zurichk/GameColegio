@@ -69,12 +69,22 @@ pub enum GameState {
     SpellingPractice,
     /// Juego del ahorcado.
     HangmanGame,
+    /// Sinónimos (Lengua).
+    SynonymsPractice,
+    /// Anagramas (Lengua).
+    AnagramPractice,
     /// Práctica de sumar/restar/multiplicar/dividir.
     MathPractice,
     /// Práctica de cálculo mental con temporizador.
     MentalPractice,
     /// Juego "Mayor, menor o igual" (comparar números).
     ComparePractice,
+    /// Fracciones (Matemáticas).
+    FractionsPractice,
+    /// Geometría (Matemáticas).
+    GeometryPractice,
+    /// Problemas de texto (Matemáticas).
+    WordProblemsPractice,
     /// Cuestionario de ciencias naturales.
     SciencePractice,
     /// Cuestionario de geografía de España.
