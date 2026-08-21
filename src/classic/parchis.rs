@@ -87,6 +87,32 @@ struct ParchisRollButton;
 struct ParchisBackButton;
 #[derive(Component)]
 struct ParchisRestartButton;
+#[derive(Component)]
+struct ParchisBoardCell(usize);
+
+fn parchis_board_position(index: usize) -> (usize, usize) {
+    let mut path = Vec::with_capacity(40);
+    for row in 0..3 { for column in 3..6 { path.push((column, row)); } }
+    for column in 6..9 { for row in 3..6 { path.push((column, row)); } }
+    for row in (6..9).rev() { for column in (3..6).rev() { path.push((column, row)); } }
+    for column in (0..3).rev() { for row in (3..6).rev() { path.push((column, row)); } }
+    path.extend([(3, 3), (5, 3), (5, 5), (3, 5)]);
+    path.push((4, 4));
+    path[index]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parchis_board_position;
+    use std::collections::HashSet;
+
+    #[test]
+    fn parchis_path_has_one_position_per_cell() {
+        let positions: Vec<_> = (0..=40).map(parchis_board_position).collect();
+        assert_eq!(positions.len(), 41);
+        assert_eq!(positions.iter().collect::<HashSet<_>>().len(), 41);
+    }
+}
 
 pub struct ParchisPlugin;
 impl Plugin for ParchisPlugin {
@@ -106,11 +132,24 @@ fn spawn_parchis(mut commands: Commands, asset_server: Res<AssetServer>) {
             panel.spawn((ParchisText(ParchisField::Status), Text::new("¡Necesitas un 6 para salir!"), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::WHITE), TextLayout { linebreak: LineBreak::WordBoundary, ..default() }, Node { max_width: Val::Px(680.0), ..default() }));
             panel.spawn((ParchisText(ParchisField::Dice), Text::new("Dado: -"), TextFont { font: font.clone(), font_size: 20.0, ..default() }, TextColor(Color::srgb(0.80, 0.95, 1.0))));
             panel.spawn((ParchisText(ParchisField::Positions), Text::new("Tú: Casa  CPU1: Casa  CPU2: Casa  CPU3: Casa"), TextFont { font: font.clone(), font_size: 16.0, ..default() }, TextColor(Color::WHITE)));
-            panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(36.0); 10], grid_template_rows: vec![GridTrack::px(36.0); 4], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), ..default() }).with_children(|grid| {
+            panel.spawn((Node { position_type: PositionType::Relative, width: Val::Px(480.0), height: Val::Px(480.0), ..default() }, BackgroundColor(Color::srgb(0.28, 0.15, 0.08)), BorderRadius::all(Val::Px(24.0)))).with_children(|board| {
+                for (left, top, color) in [
+                    (Val::Px(12.0), Val::Px(12.0), Color::srgb(0.78, 0.20, 0.22)),
+                    (Val::Px(312.0), Val::Px(12.0), Color::srgb(0.96, 0.72, 0.16)),
+                    (Val::Px(12.0), Val::Px(312.0), Color::srgb(0.18, 0.42, 0.78)),
+                    (Val::Px(312.0), Val::Px(312.0), Color::srgb(0.22, 0.66, 0.34)),
+                ] {
+                    board.spawn((Node { position_type: PositionType::Absolute, left, top, width: Val::Px(144.0), height: Val::Px(144.0), ..default() }, BackgroundColor(color), BorderRadius::all(Val::Px(18.0))));
+                }
+                board.spawn((Node { position_type: PositionType::Absolute, left: Val::Px(186.0), top: Val::Px(186.0), width: Val::Px(96.0), height: Val::Px(96.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgb(0.86, 0.62, 0.16)), BorderRadius::all(Val::Px(48.0)))).with_children(|goal| {
+                    goal.spawn((Text::new("META"), TextFont { font: font.clone(), font_size: 13.0, ..default() }, TextColor(Color::WHITE)));
+                });
                 for n in 0..=40 {
+                    let (column, row) = parchis_board_position(n);
                     let is_safe = SAFE.contains(&n);
-                    let bg = if n==40 { Color::srgb(0.85, 0.75, 0.20) } else if is_safe { Color::srgb(0.20, 0.60, 0.20) } else { Color::srgb(0.15, 0.18, 0.28) };
-                    grid.spawn((Node { width: Val::Px(36.0), height: Val::Px(36.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(bg), BorderRadius::all(Val::Px(6.0)))).with_children(|c| { c.spawn((Text::new(n.to_string()), TextFont { font: font.clone(), font_size: 10.0, ..default() }, TextColor(Color::WHITE))); });
+                    let bg = if n==40 { Color::srgb(0.86, 0.62, 0.16) } else if is_safe { Color::srgb(0.18, 0.52, 0.30) } else if n % 2 == 0 { Color::srgb(0.16, 0.32, 0.42) } else { Color::srgb(0.12, 0.25, 0.36) };
+                    let label = if n == 40 { "META".to_string() } else if is_safe { format!("{} *", n) } else { n.to_string() };
+                    board.spawn((ParchisBoardCell(n), Node { position_type: PositionType::Absolute, left: Val::Px(10.0 + column as f32 * 52.0), top: Val::Px(10.0 + row as f32 * 52.0), width: Val::Px(44.0), height: Val::Px(44.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(bg), BorderRadius::all(Val::Px(22.0)))).with_children(|c| { c.spawn((Text::new(label), TextFont { font: font.clone(), font_size: 10.0, ..default() }, TextColor(Color::WHITE))); });
                 }
             });
             panel.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), ..default() }).with_children(|row| {
@@ -135,6 +174,8 @@ fn update_parchis(
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<ParchisBackButton>)>,
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<ParchisRestartButton>)>,
     mut texts: Query<(&ParchisText, &mut Text)>,
+    mut board_cells: Query<(&ParchisBoardCell, &Children, &mut BackgroundColor)>,
+    mut cell_texts: Query<&mut Text, Without<ParchisText>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::ClassicMenu); return; }
@@ -162,6 +203,17 @@ fn update_parchis(
                 *text = Text::new(format!("Tú: {}  CPU1: {}  CPU2: {}  CPU3: {}", fmt(session.pos[0]), fmt(session.pos[1]), fmt(session.pos[2]), fmt(session.pos[3])));
             }
             _ => {}
+        }
+    }
+    for (cell, children, mut background) in &mut board_cells {
+        let occupants: Vec<usize> = session.pos.iter().enumerate().filter_map(|(idx, pos)| (*pos == Some(cell.0)).then_some(idx)).collect();
+        *background = if cell.0 == 40 { BackgroundColor(Color::srgb(0.86, 0.62, 0.16)) } else if occupants.is_empty() && ParchisSession::is_safe(cell.0) { BackgroundColor(Color::srgb(0.18, 0.52, 0.30)) } else if occupants.is_empty() && cell.0 % 2 == 0 { BackgroundColor(Color::srgb(0.16, 0.32, 0.42)) } else if occupants.is_empty() { BackgroundColor(Color::srgb(0.12, 0.25, 0.36)) } else { BackgroundColor(Color::srgb(0.74, 0.32, 0.18)) };
+        for child in children.iter() {
+            if let Ok(mut text) = cell_texts.get_mut(child) {
+                let base = if cell.0 == 40 { "META".to_string() } else if ParchisSession::is_safe(cell.0) { format!("{} *", cell.0) } else { cell.0.to_string() };
+                let tokens = occupants.iter().map(|idx| match idx { 0 => "T", 1 => "1", 2 => "2", _ => "3" }).collect::<Vec<_>>().join(" ");
+                *text = Text::new(if tokens.is_empty() { base } else { format!("{}\n{}", base, tokens) });
+            }
         }
     }
 }

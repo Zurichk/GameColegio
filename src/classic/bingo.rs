@@ -88,9 +88,9 @@ fn spawn_bingo(mut commands: Commands, asset_server: Res<AssetServer>) {
                 panel.spawn((BingoText(BingoField::Title), Text::new("BINGO 5×5"), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::srgb(0.95, 0.85, 0.40))));
                 panel.spawn((BingoText(BingoField::Last), Text::new("Último: -"), TextFont { font: font.clone(), font_size: 22.0, ..default() }, TextColor(Color::srgb(0.80, 0.95, 1.0))));
                 panel.spawn((BingoText(BingoField::Status), Text::new("¡Saca bolas!"), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::WHITE)));
-                panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(80.0); SIZE], grid_template_rows: vec![GridTrack::px(60.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), ..default() }).with_children(|grid| {
+                panel.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(80.0); SIZE], grid_template_rows: vec![GridTrack::px(60.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), padding: UiRect::all(Val::Px(8.0)), ..default() }, BackgroundColor(Color::srgb(0.12, 0.34, 0.28)), BorderRadius::all(Val::Px(14.0)))).with_children(|grid| {
                     for r in 0..SIZE { for c in 0..SIZE {
-                        grid.spawn((BingoCell(r,c), Node { width: Val::Px(80.0), height: Val::Px(60.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(Color::srgb(0.85, 0.80, 0.70)), BorderRadius::all(Val::Px(6.0)))).with_children(|cell| { cell.spawn((Text::new("".to_string()), TextFont { font: font.clone(), font_size: 20.0, ..default() }, TextColor(Color::BLACK))); });
+                        grid.spawn((BingoCell(r,c), Node { width: Val::Px(80.0), height: Val::Px(60.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(if (r+c)%2 == 0 { Color::srgb(0.96, 0.88, 0.62) } else { Color::srgb(0.90, 0.74, 0.40) }), BorderRadius::all(Val::Px(18.0)))).with_children(|cell| { cell.spawn((Text::new("".to_string()), TextFont { font: font.clone(), font_size: 20.0, ..default() }, TextColor(Color::BLACK))); });
                     }}
                 });
                 panel.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), ..default() }).with_children(|row| {
@@ -133,7 +133,7 @@ fn update_bingo(
     for (cell, mut bg, children) in &mut cell_query {
         let (r,c) = (cell.0, cell.1);
         let marked = session.marked[r][c];
-        *bg = BackgroundColor(if marked { Color::srgb(0.30, 0.70, 0.30) } else { Color::srgb(0.85, 0.80, 0.70) });
+        *bg = BackgroundColor(if marked { Color::srgb(0.24, 0.66, 0.34) } else if (r+c)%2 == 0 { Color::srgb(0.96, 0.88, 0.62) } else { Color::srgb(0.90, 0.74, 0.40) });
         for child in children.iter() {
             if let Ok(mut text) = cell_texts.get_mut(child) {
                 let val = session.card[r][c];

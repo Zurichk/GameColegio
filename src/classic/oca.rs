@@ -103,6 +103,41 @@ struct OcaRollButton;
 struct OcaBackButton;
 #[derive(Component)]
 struct OcaRestartButton;
+#[derive(Component)]
+struct OcaBoardCell(usize);
+
+fn oca_board_position(index: usize) -> (usize, usize) {
+    let mut path = Vec::with_capacity(63);
+    let (mut left, mut top, mut right, mut bottom) = (0usize, 0usize, 8usize, 6usize);
+    while left <= right && top <= bottom {
+        for column in left..=right { path.push((column, top)); }
+        top += 1;
+        for row in top..=bottom { path.push((right, row)); }
+        if top <= bottom {
+            right = right.saturating_sub(1);
+            for column in (left..=right).rev() { path.push((column, bottom)); }
+        }
+        if left <= right && top <= bottom {
+            bottom = bottom.saturating_sub(1);
+            for row in (top..=bottom).rev() { path.push((left, row)); }
+        }
+        left += 1;
+    }
+    path[index]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::oca_board_position;
+    use std::collections::HashSet;
+
+    #[test]
+    fn oca_path_has_one_position_per_cell() {
+        let positions: Vec<_> = (0..63).map(oca_board_position).collect();
+        assert_eq!(positions.len(), 63);
+        assert_eq!(positions.iter().collect::<HashSet<_>>().len(), 63);
+    }
+}
 
 pub struct OcaPlugin;
 impl Plugin for OcaPlugin {
@@ -124,12 +159,15 @@ fn spawn_oca(mut commands: Commands, asset_server: Res<AssetServer>) {
                 panel.spawn((OcaText(OcaField::Status), Text::new("¡Tira el dado!"), TextFont { font: font.clone(), font_size: 20.0, ..default() }, TextColor(Color::WHITE), TextLayout { linebreak: LineBreak::WordBoundary, ..default() }, Node { max_width: Val::Px(720.0), ..default() }));
                 panel.spawn((OcaText(OcaField::Dice), Text::new("Dado: -"), TextFont { font: font.clone(), font_size: 22.0, ..default() }, TextColor(Color::srgb(0.80, 0.95, 1.0))));
                 panel.spawn((OcaText(OcaField::Positions), Text::new("Tú: 0  CPU: 0"), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::WHITE)));
-                // tablero 7x9 =63
-                panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(40.0); 9], grid_template_rows: vec![GridTrack::px(40.0); 7], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), ..default() }).with_children(|grid| {
+                // Tablero clásico en espiral: 9 x 7 casillas y jardín central.
+                panel.spawn((Node { position_type: PositionType::Relative, width: Val::Px(468.0), height: Val::Px(364.0), ..default() }, BackgroundColor(Color::srgb(0.34, 0.17, 0.08)), BorderRadius::all(Val::Px(24.0)))).with_children(|board| {
                     for n in 1..=63 {
+                    let (column, row) = oca_board_position(n - 1);
                         let is_oca = OCAS.contains(&n);
-                        let bg = if n==63 { Color::srgb(0.85, 0.75, 0.20) } else if is_oca { Color::srgb(0.20, 0.60, 0.20) } else if [6,12,19,31,42,56,58].contains(&n) { Color::srgb(0.60, 0.30, 0.20) } else { Color::srgb(0.15, 0.18, 0.28) };
-                        grid.spawn((Node { width: Val::Px(40.0), height: Val::Px(40.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(bg), BorderRadius::all(Val::Px(6.0)))).with_children(|c| { c.spawn((Text::new(n.to_string()), TextFont { font: font.clone(), font_size: 12.0, ..default() }, TextColor(Color::WHITE))); });
+                        let is_special = [6,12,19,31,42,56,58].contains(&n);
+                        let bg = if n==63 { Color::srgb(0.86, 0.62, 0.16) } else if is_oca { Color::srgb(0.18, 0.52, 0.30) } else if is_special { Color::srgb(0.62, 0.28, 0.20) } else if n % 2 == 0 { Color::srgb(0.16, 0.32, 0.42) } else { Color::srgb(0.12, 0.25, 0.36) };
+                        let label = if n == 63 { "META".to_string() } else if is_oca { format!("{} O", n) } else if is_special { format!("{} !", n) } else { n.to_string() };
+                        board.spawn((OcaBoardCell(n), Node { position_type: PositionType::Absolute, left: Val::Px(4.0 + column as f32 * 52.0), top: Val::Px(4.0 + row as f32 * 52.0), width: Val::Px(48.0), height: Val::Px(48.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(bg), BorderRadius::all(Val::Px(24.0)))).with_children(|c| { c.spawn((Text::new(label), TextFont { font: font.clone(), font_size: 11.0, ..default() }, TextColor(Color::WHITE))); });
                     }
                 });
                 panel.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), ..default() }).with_children(|row| {
@@ -154,6 +192,8 @@ fn update_oca(
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<OcaBackButton>)>,
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<OcaRestartButton>)>,
     mut texts: Query<(&OcaText, &mut Text)>,
+    mut board_cells: Query<(&OcaBoardCell, &Children, &mut BackgroundColor)>,
+    mut cell_texts: Query<&mut Text, Without<OcaText>>,
     time: Res<Time>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
@@ -183,6 +223,18 @@ fn update_oca(
             OcaField::Dice => { *text = Text::new(format!("Dado: {}", session.dice)); }
             OcaField::Positions => { *text = Text::new(format!("Tú: {}  CPU: {}  Turno: {}", session.pos_player, session.pos_cpu, if session.turn=='P' {"Tú"} else {"CPU"})); }
             _ => {}
+        }
+    }
+    for (cell, children, mut background) in &mut board_cells {
+        let player_here = session.pos_player == cell.0;
+        let cpu_here = session.pos_cpu == cell.0;
+        *background = BackgroundColor(if player_here && cpu_here { Color::srgb(0.72, 0.38, 0.16) } else if player_here { Color::srgb(0.12, 0.62, 0.82) } else if cpu_here { Color::srgb(0.82, 0.22, 0.30) } else if cell.0 == 63 { Color::srgb(0.86, 0.62, 0.16) } else if OCAS.contains(&cell.0) { Color::srgb(0.18, 0.52, 0.30) } else if [6,12,19,31,42,56,58].contains(&cell.0) { Color::srgb(0.62, 0.28, 0.20) } else if cell.0 % 2 == 0 { Color::srgb(0.16, 0.32, 0.42) } else { Color::srgb(0.12, 0.25, 0.36) });
+        for child in children.iter() {
+            if let Ok(mut text) = cell_texts.get_mut(child) {
+                let marker = match (player_here, cpu_here) { (true, true) => "T+C", (true, false) => "T", (false, true) => "C", _ => "" };
+                let base = if cell.0 == 63 { "META".to_string() } else if OCAS.contains(&cell.0) { format!("{} O", cell.0) } else if [6,12,19,31,42,56,58].contains(&cell.0) { format!("{} !", cell.0) } else { cell.0.to_string() };
+                *text = Text::new(if marker.is_empty() { base } else { format!("{}\n{}", base, marker) });
+            }
         }
     }
 }

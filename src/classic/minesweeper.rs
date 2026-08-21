@@ -119,7 +119,7 @@ fn spawn_minesweeper(mut commands: Commands, asset_server: Res<AssetServer>) {
             overlay.spawn((Node { flex_direction: FlexDirection::Column, width: Val::Px(720.0), padding: UiRect::axes(Val::Px(20.0), Val::Px(16.0)), row_gap: Val::Px(10.0), align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgba(0.07, 0.09, 0.18, 0.96)), BorderRadius::all(Val::Px(16.0)))).with_children(|panel| {
                 panel.spawn((MinesweeperText(MinesweeperField::Title), Text::new("BUSCAMINAS 8×8"), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::srgb(0.95, 0.85, 0.40))));
                 panel.spawn((MinesweeperText(MinesweeperField::Status), Text::new("Minas: 10  Banderas: 0"), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::WHITE)));
-                panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(48.0); SIZE], grid_template_rows: vec![GridTrack::px(48.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), ..default() }).with_children(|grid| {
+                panel.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(48.0); SIZE], grid_template_rows: vec![GridTrack::px(48.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), padding: UiRect::all(Val::Px(8.0)), ..default() }, BackgroundColor(Color::srgb(0.16, 0.18, 0.20)), BorderRadius::all(Val::Px(12.0)))).with_children(|grid| {
                     for r in 0..SIZE { for c in 0..SIZE {
                         grid.spawn((Button, MinesweeperCellButton(r,c), Node { width: Val::Px(48.0), height: Val::Px(48.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(Color::srgb(0.18, 0.22, 0.34)), BorderColor(Color::srgb(0.45, 0.50, 0.65)), BorderRadius::all(Val::Px(6.0)))).with_children(|cell| { cell.spawn((Text::new("".to_string()), TextFont { font: font.clone(), font_size: 20.0, ..default() }, TextColor(Color::WHITE))); });
                     }}
@@ -176,9 +176,9 @@ fn update_minesweeper(
         let state = session.state[r][c];
         let cell = session.board[r][c];
         *bg = BackgroundColor(match state {
-            State::Hidden => Color::srgb(0.18, 0.22, 0.34),
-            State::Flagged => Color::srgb(0.60, 0.30, 0.20),
-            State::Revealed => match cell { Cell::Mine => Color::srgb(0.85, 0.20, 0.20), Cell::Number(0) => Color::srgb(0.12, 0.14, 0.24), _ => Color::srgb(0.22, 0.24, 0.34) },
+            State::Hidden => Color::srgb(0.30, 0.34, 0.36),
+            State::Flagged => Color::srgb(0.72, 0.28, 0.20),
+            State::Revealed => match cell { Cell::Mine => Color::srgb(0.85, 0.20, 0.20), Cell::Number(0) => Color::srgb(0.72, 0.70, 0.60), _ => Color::srgb(0.58, 0.60, 0.54) },
         });
         for child in children.iter() {
             if let Ok(mut text) = cell_texts.get_mut(child) {

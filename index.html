@@ -76,9 +76,9 @@
             } catch (err) {
                 console.error(err);
                 const msg = String(err && err.message ? err.message : err);
-                // Mensaje específico para el bug de Table.grow
+                // Orientar sobre el problema de herramientas de optimización WASM.
                 const hint = msg.includes("Table.grow") || msg.includes("table")
-                    ? "<br><small>Error de tabla WASM — recompila con <code>getrandom wasm_js</code> (ya parcheado). Haz hard-refresh (Ctrl+F5).</small>"
+                    ? "<br><small>Error de tabla WASM — reconstruye la imagen con Binaryen 110 o superior y limpia la caché del navegador.</small>"
                     : "";
                 document.getElementById("loading").innerHTML =
                     '<div>No se pudo iniciar el juego</div><small style="color:#ffb4b4;word-break:break-word">' + msg + '</small>' + hint;

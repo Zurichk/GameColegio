@@ -105,10 +105,10 @@ fn spawn_connect4(mut commands: Commands, asset_server: Res<AssetServer>) {
                     }
                 });
                 // grid 6x7
-                panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(60.0); COLS], grid_template_rows: vec![GridTrack::px(60.0); ROWS], column_gap: Val::Px(6.0), row_gap: Val::Px(6.0), ..default() }).with_children(|grid| {
+                panel.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(60.0); COLS], grid_template_rows: vec![GridTrack::px(60.0); ROWS], column_gap: Val::Px(6.0), row_gap: Val::Px(6.0), padding: UiRect::all(Val::Px(10.0)), ..default() }, BackgroundColor(Color::srgb(0.08, 0.25, 0.58)), BorderRadius::all(Val::Px(18.0)))).with_children(|grid| {
                     for r in 0..ROWS {
                         for c in 0..COLS {
-                            grid.spawn((Node { width: Val::Px(60.0), height: Val::Px(60.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(2.0)), ..default() }, BackgroundColor(Color::srgb(0.12, 0.14, 0.24)), BorderColor(Color::srgb(0.45, 0.50, 0.65)), BorderRadius::all(Val::Px(30.0)))).with_children(|cell| {
+                            grid.spawn((Node { width: Val::Px(60.0), height: Val::Px(60.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(2.0)), ..default() }, BackgroundColor(Color::srgb(0.92, 0.86, 0.62)), BorderColor(Color::srgb(0.04, 0.16, 0.40)), BorderRadius::all(Val::Px(30.0)))).with_children(|cell| {
                                 cell.spawn((Connect4CellText(r,c), Text::new("".to_string()), TextFont { font: font.clone(), font_size: 32.0, ..default() }, TextColor(Color::WHITE)));
                             });
                         }

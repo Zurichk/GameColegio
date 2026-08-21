@@ -125,14 +125,14 @@ fn spawn_battleship(mut commands: Commands, asset_server: Res<AssetServer>) {
                     // Enemigo
                     row.spawn(Node { flex_direction: FlexDirection::Column, align_items: AlignItems::Center, row_gap: Val::Px(6.0), ..default() }).with_children(|col| {
                         col.spawn((BattleshipText(BattleshipField::EnemyLabel), Text::new("Mar enemigo (toca para disparar)"), TextFont { font: font.clone(), font_size: 16.0, ..default() }, TextColor(Color::srgb(0.80, 0.85, 1.0))));
-                        col.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(56.0); SIZE], grid_template_rows: vec![GridTrack::px(56.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), ..default() }).with_children(|grid| {
+                        col.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(56.0); SIZE], grid_template_rows: vec![GridTrack::px(56.0); SIZE], column_gap: Val::Px(4.0), row_gap: Val::Px(4.0), padding: UiRect::all(Val::Px(8.0)), ..default() }, BackgroundColor(Color::srgb(0.04, 0.26, 0.42)), BorderRadius::all(Val::Px(16.0)))).with_children(|grid| {
                             for r in 0..SIZE { for c in 0..SIZE { grid.spawn((Button, BattleshipEnemyCell(r,c), Node { width: Val::Px(56.0), height: Val::Px(56.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(2.0)), ..default() }, BackgroundColor(Color::srgb(0.15, 0.22, 0.34)), BorderColor(Color::srgb(0.50, 0.55, 0.70)), BorderRadius::all(Val::Px(6.0)))).with_children(|cell| { cell.spawn((Text::new("·".to_string()), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::WHITE))); }); } }
                         });
                     });
                     // Jugador
                     row.spawn(Node { flex_direction: FlexDirection::Column, align_items: AlignItems::Center, row_gap: Val::Px(6.0), ..default() }).with_children(|col| {
                         col.spawn((BattleshipText(BattleshipField::PlayerLabel), Text::new("Tu mar"), TextFont { font: font.clone(), font_size: 16.0, ..default() }, TextColor(Color::srgb(0.80, 0.85, 1.0))));
-                        col.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(40.0); SIZE], grid_template_rows: vec![GridTrack::px(40.0); SIZE], column_gap: Val::Px(3.0), row_gap: Val::Px(3.0), ..default() }).with_children(|grid| {
+                        col.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(40.0); SIZE], grid_template_rows: vec![GridTrack::px(40.0); SIZE], column_gap: Val::Px(3.0), row_gap: Val::Px(3.0), padding: UiRect::all(Val::Px(6.0)), ..default() }, BackgroundColor(Color::srgb(0.04, 0.26, 0.42)), BorderRadius::all(Val::Px(14.0)))).with_children(|grid| {
                             for r in 0..SIZE { for c in 0..SIZE { grid.spawn((BattleshipPlayerCell(r,c), Node { width: Val::Px(40.0), height: Val::Px(40.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(Color::srgb(0.12, 0.14, 0.24)), BorderRadius::all(Val::Px(4.0)))).with_children(|cell| { cell.spawn((Text::new("·".to_string()), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::srgba(1.0,1.0,1.0,0.6)))); }); } }
                         });
                     });
@@ -187,7 +187,7 @@ fn update_battleship(
     // Actualizar colores de celdas enemigas (solo revela Hit/Miss, no Ship)
     for (cell, mut bg, children) in &mut enemy_cells {
         let state = session.cpu[cell.0][cell.1];
-        *bg = BackgroundColor(match state { Cell::Hit => Color::srgb(0.90, 0.25, 0.25), Cell::Miss => Color::srgb(0.25, 0.35, 0.55), _ => Color::srgb(0.15, 0.22, 0.34) });
+        *bg = BackgroundColor(match state { Cell::Hit => Color::srgb(0.90, 0.25, 0.25), Cell::Miss => Color::srgb(0.38, 0.72, 0.82), _ => Color::srgb(0.08, 0.42, 0.58) });
         for child in children.iter() {
             if let Ok(mut text) = cell_texts.get_mut(child) {
                 *text = Text::new(match state { Cell::Hit => "✕".to_string(), Cell::Miss => "○".to_string(), _ => "·".to_string() });
@@ -196,6 +196,6 @@ fn update_battleship(
     }
     for (cell, mut bg) in &mut player_cells {
         let state = session.player[cell.0][cell.1];
-        *bg = BackgroundColor(match state { Cell::Ship => Color::srgb(0.30, 0.55, 0.30), Cell::Hit => Color::srgb(0.90, 0.25, 0.25), Cell::Miss => Color::srgb(0.25, 0.35, 0.55), _ => Color::srgb(0.12, 0.14, 0.24) });
+        *bg = BackgroundColor(match state { Cell::Ship => Color::srgb(0.28, 0.36, 0.38), Cell::Hit => Color::srgb(0.90, 0.25, 0.25), Cell::Miss => Color::srgb(0.38, 0.72, 0.82), _ => Color::srgb(0.08, 0.34, 0.48) });
     }
 }

@@ -22,10 +22,22 @@ RUN apt-get update \
         libudev-dev \
         clang \
         lld \
-        binaryen \
         curl \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Binaryen del repositorio Debian puede ser demasiado antiguo para las tablas
+# externref que genera wasm-bindgen. Binaryen >= 110 contiene la corrección de
+# exportación de tablas; se fija una versión reciente para que Coolify no
+# dependa de la versión disponible en la distribución base.
+ARG BINARYEN_VERSION=126
+RUN curl -fsSL -o /tmp/binaryen.tar.gz \
+        "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz" \
+    && echo "e487e0eac1f02a6739816c617270b033e5d3f8ca90439301fd0286460322fd76  /tmp/binaryen.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/binaryen.tar.gz -C /opt \
+    && ln -sf "/opt/binaryen-version_${BINARYEN_VERSION}/bin/wasm-opt" /usr/local/bin/wasm-opt \
+    && rm -f /tmp/binaryen.tar.gz \
+    && wasm-opt --version
 
 # Target de compilación web + herramienta de generación de bindings JS.
 RUN rustup target add wasm32-unknown-unknown \
@@ -38,9 +50,9 @@ RUN rustup target add wasm32-unknown-unknown \
 
 WORKDIR /app
 
-# Build WASM — el fix de Table.grow ahora está en Cargo.toml con alias
-# getrandom_02/03/04 (todos con backend js/wasm_js), así que no hace falta
-# forzar RUSTFLAGS aquí. Se deja CARGO_BUILD_JOBS=1 para no OOM en VPS 2GB.
+# Build WASM — getrandom usa los backends JS declarados en Cargo.toml y
+# wasm-opt usa Binaryen 126 para no corromper las tablas externref.
+# Se deja CARGO_BUILD_JOBS=1 para no agotar la memoria del VPS de 2 GB.
 ENV CARGO_INCREMENTAL=0
 ENV CARGO_NET_RETRY=3
 ENV CARGO_BUILD_JOBS=1
@@ -70,8 +82,8 @@ RUN wasm-bindgen \
         --out-dir web \
         target/wasm32-unknown-unknown/release/gamecolegio.wasm
 
-# Optimiza el WASM — `-Oz` (size) es más seguro que `-O3` con Bevy (evita el
-# bug de Table.grow). Se habilitan bulk-memory y reference-types que Bevy usa.
+# Optimiza el WASM — `-Oz` reduce el tamaño y se habilitan las extensiones que
+# Bevy usa. Binaryen 126 conserva correctamente las tablas externref.
 # Si falla, el build sigue (wasm-opt es opcional, solo reduce tamaño).
 RUN wasm-opt --strip-debug -Oz \
         --enable-bulk-memory --enable-reference-types \

@@ -16,7 +16,6 @@ struct CheckersSession {
     board: [[Piece; SIZE]; SIZE],
     selected: Option<(usize, usize)>,
     turn: Piece, // Red (jugador) o Black (CPU)
-    winner: Option<Piece>,
 }
 
 impl CheckersSession {
@@ -32,7 +31,7 @@ impl CheckersSession {
                 if (r + c) % 2 == 1 { board[r][c] = Piece::Red; }
             }
         }
-        Self { board, selected: None, turn: Piece::Red, winner: None }
+        Self { board, selected: None, turn: Piece::Red }
     }
     fn can_move(&self, from: (usize,usize), to: (usize,usize)) -> bool {
         let (fr, fc) = from;
@@ -94,10 +93,10 @@ fn spawn_checkers(mut commands: Commands, asset_server: Res<AssetServer>) {
             overlay.spawn((Node { flex_direction: FlexDirection::Column, width: Val::Px(680.0), padding: UiRect::axes(Val::Px(20.0), Val::Px(16.0)), row_gap: Val::Px(10.0), align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgba(0.07, 0.09, 0.18, 0.96)), BorderRadius::all(Val::Px(16.0)))).with_children(|panel| {
                 panel.spawn((CheckersText(CheckersField::Title), Text::new("DAMAS 8×8"), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::srgb(0.95, 0.85, 0.40))));
                 panel.spawn((CheckersText(CheckersField::Status), Text::new("Turno: Rojas (tú)"), TextFont { font: font.clone(), font_size: 18.0, ..default() }, TextColor(Color::WHITE)));
-                panel.spawn(Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(56.0); SIZE], grid_template_rows: vec![GridTrack::px(56.0); SIZE], column_gap: Val::Px(2.0), row_gap: Val::Px(2.0), ..default() }).with_children(|grid| {
+                panel.spawn((Node { display: Display::Grid, grid_template_columns: vec![GridTrack::px(56.0); SIZE], grid_template_rows: vec![GridTrack::px(56.0); SIZE], column_gap: Val::Px(2.0), row_gap: Val::Px(2.0), padding: UiRect::all(Val::Px(8.0)), ..default() }, BackgroundColor(Color::srgb(0.30, 0.16, 0.09)), BorderRadius::all(Val::Px(14.0)))).with_children(|grid| {
                     for r in 0..SIZE { for c in 0..SIZE {
                         let is_black = (r + c) % 2 == 1;
-                        let bg = if is_black { Color::srgb(0.25, 0.20, 0.15) } else { Color::srgb(0.85, 0.80, 0.70) };
+                        let bg = if is_black { Color::srgb(0.36, 0.20, 0.12) } else { Color::srgb(0.88, 0.70, 0.46) };
                         grid.spawn((Button, CheckersCellButton(r,c), Node { width: Val::Px(56.0), height: Val::Px(56.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(1.0)), ..default() }, BackgroundColor(bg), BorderRadius::all(Val::Px(4.0)))).with_children(|cell| { cell.spawn((Text::new("".to_string()), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::WHITE))); });
                     }}
                 });
@@ -166,7 +165,7 @@ fn update_checkers(
     for (btn, mut bg, children) in &mut cell_query {
         let (r,c) = (btn.0, btn.1);
         let is_selected = session.selected == Some((r,c));
-        let base = if (r+c)%2==1 { Color::srgb(0.25, 0.20, 0.15) } else { Color::srgb(0.85, 0.80, 0.70) };
+        let base = if (r+c)%2==1 { Color::srgb(0.36, 0.20, 0.12) } else { Color::srgb(0.88, 0.70, 0.46) };
         *bg = BackgroundColor(if is_selected { Color::srgb(0.30, 0.60, 0.30) } else { base });
         for child in children.iter() {
             if let Ok(mut text) = cell_texts.get_mut(child) {
