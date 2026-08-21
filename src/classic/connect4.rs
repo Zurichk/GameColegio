@@ -134,8 +134,8 @@ fn update_connect4(
     col_clicks: Query<(&Interaction, &Connect4ColButton), (Changed<Interaction>, Without<Connect4BackButton>)>,
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<Connect4BackButton>)>,
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<Connect4RestartButton>)>,
-    mut cell_texts: Query<(&Connect4CellText, &mut Text, &mut TextColor)>,
-    mut status_text: Query<(&Connect4Text, &mut Text)>,
+    mut cell_texts: Query<(&Connect4CellText, &mut Text, &mut TextColor), Without<Connect4Text>>,
+    mut status_text: Query<(&Connect4Text, &mut Text), Without<Connect4CellText>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::ClassicMenu); return; }

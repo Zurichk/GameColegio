@@ -157,10 +157,10 @@ fn update_battleship(
     enemy_clicks: Query<(&Interaction, &BattleshipEnemyCell), (Changed<Interaction>, Without<BattleshipBackButton>)>,
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<BattleshipBackButton>)>,
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<BattleshipRestartButton>)>,
-    mut texts: Query<(&BattleshipText, &mut Text)>,
-    mut enemy_cells: Query<(&BattleshipEnemyCell, &mut BackgroundColor, &Children)>,
-    mut player_cells: Query<(&BattleshipPlayerCell, &mut BackgroundColor)>,
-    mut cell_texts: Query<&mut Text>,
+    mut texts: Query<(&BattleshipText, &mut Text), Without<BattleshipEnemyCell>>,
+    mut enemy_cells: Query<(&BattleshipEnemyCell, &mut BackgroundColor, &Children), Without<BattleshipPlayerCell>>,
+    mut player_cells: Query<(&BattleshipPlayerCell, &mut BackgroundColor), Without<BattleshipEnemyCell>>,
+    mut cell_texts: Query<&mut Text, Without<BattleshipText>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::ClassicMenu); return; }

@@ -90,8 +90,8 @@ fn update_guess(
     mut commands: Commands,
     sfx: Res<Sfx>,
     mut session: ResMut<GuessSession>,
-    mut input: Query<&mut Text, With<GuessInputText>>,
-    mut texts: Query<(&GuessText, &mut Text, &mut TextColor)>,
+    mut input: Query<&mut Text, (With<GuessInputText>, Without<GuessText>)>,
+    mut texts: Query<(&GuessText, &mut Text, &mut TextColor), Without<GuessInputText>>,
     number_clicks: Query<(&Interaction, &GuessNumberButton), (Changed<Interaction>, Without<GuessBackButton>)>,
     submit_clicks: Query<&Interaction, (Changed<Interaction>, With<GuessSubmitButton>)>,
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<GuessBackButton>)>,
@@ -99,7 +99,7 @@ fn update_guess(
 ) {
     // estado typed local
     let mut typed = String::new();
-    for mut text in &mut input { typed = text.0.clone(); }
+    for text in &input { typed = text.0.clone(); }
 
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::MathMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::MathMenu); return; }

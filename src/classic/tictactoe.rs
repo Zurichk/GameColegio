@@ -88,8 +88,8 @@ fn update_tictactoe(
     cell_clicks: Query<(&Interaction, &TicTacToeCellButton), (Changed<Interaction>, Without<TicTacToeBackButton>)>,
     back_clicks: Query<&Interaction, (Changed<Interaction>, With<TicTacToeBackButton>)>,
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<TicTacToeRestartButton>)>,
-    mut cell_texts: Query<(&TicTacToeCellText, &mut Text)>,
-    mut status_text: Query<(&TicTacToeText, &mut Text)>,
+    mut cell_texts: Query<(&TicTacToeCellText, &mut Text), Without<TicTacToeText>>,
+    mut status_text: Query<(&TicTacToeText, &mut Text), Without<TicTacToeCellText>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::ClassicMenu); return; }
