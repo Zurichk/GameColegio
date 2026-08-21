@@ -1,8 +1,9 @@
 //! Cámara en tercera persona que sigue y rota alrededor del jugador.
 
+use bevy::core_pipeline::bloom::Bloom;
 use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::input::mouse::MouseMotion;
-use bevy::pbr::{DistanceFog, FogFalloff};
+use bevy::pbr::{DistanceFog, FogFalloff, ScreenSpaceAmbientOcclusion};
 use bevy::prelude::*;
 use bevy::window::CursorGrabMode;
 
@@ -66,9 +67,8 @@ impl Plugin for ThirdPersonCameraPlugin {
     }
 }
 
-/// Crea la cámara y el fondo de la escena.
+/// Crea la cámara y el fondo de la escena — ahora con PBR fotorealista.
 fn spawn_camera(mut commands: Commands) {
-
     commands.spawn((
         Camera3d::default(),
         Camera {
@@ -77,6 +77,14 @@ fn spawn_camera(mut commands: Commands) {
         },
         // Mapeo de tonos cinematográfico: más contraste y saturación.
         Tonemapping::AcesFitted,
+        Bloom {
+            intensity: 0.12,
+            ..default()
+        },
+        ScreenSpaceAmbientOcclusion {
+            quality_level: bevy::pbr::ScreenSpaceAmbientOcclusionQualityLevel::Low,
+            ..default()
+        },
         DistanceFog {
             color: Color::srgb(0.72, 0.86, 1.0),
             falloff: FogFalloff::Linear {
@@ -85,6 +93,9 @@ fn spawn_camera(mut commands: Commands) {
             },
             ..default()
         },
+        // SSAO en Bevy 0.16 exige Msaa::Off (si no, error en log y SSAO desactivado).
+        // Se usa SMAA vía post-proceso si se quiere anti-aliasing con SSAO.
+        Msaa::Off,
         ThirdPersonCamera::default(),
         Transform::from_xyz(0.0, 4.0, 22.0).looking_at(Vec3::new(0.0, 1.6, 16.0), Vec3::Y),
     ));

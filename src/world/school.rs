@@ -60,7 +60,7 @@ impl Plugin for SchoolPlugin {
     }
 }
 
-/// Paleta de materiales reutilizada durante la construcción.
+/// Paleta de materiales PBR fotorealista low-poly.
 struct Palette {
     ground: Handle<StandardMaterial>,
     floor: Handle<StandardMaterial>,
@@ -98,6 +98,12 @@ struct Palette {
     goal: Handle<StandardMaterial>,
     /// Cristal de ventana con brillo interior.
     glass: Handle<StandardMaterial>,
+    /// Zócalo de piedra (fachada).
+    stone: Handle<StandardMaterial>,
+    /// Bordillo de acera.
+    curb: Handle<StandardMaterial>,
+    /// Rodapié interior.
+    skirting: Handle<StandardMaterial>,
 }
 
 impl Palette {
@@ -105,39 +111,72 @@ impl Palette {
         materials: &mut Assets<StandardMaterial>,
         images: &mut Assets<Image>,
     ) -> Self {
-        // Texturas procedurales (una sola instancia por tipo).
+        // Texturas procedurales 256px fotorealistas.
         let floor_tex = images.add(textures::floor_tiles());
         let grass_tex = images.add(textures::grass());
         let plaster_tex = images.add(textures::plaster());
         let blackboard_tex = images.add(textures::blackboard());
         let wood_tex = images.add(textures::wood());
+        let stone_tex = images.add(textures::stone());
+        let roof_tex = images.add(textures::roof_tiles());
 
-        let wall = add_textured(
+        // Paredes y suelos con PBR calibrado.
+        let wall = add_textured_pbr(
             materials,
             &plaster_tex,
             Color::srgb(0.93, 0.91, 0.86),
-            0.9,
+            0.85,
+            0.0,
         );
-        let floor = add_textured(materials, &floor_tex, Color::WHITE, 0.7);
-        let ground = add_textured(materials, &grass_tex, Color::WHITE, 0.9);
-        let blackboard = add_textured(materials, &blackboard_tex, Color::WHITE, 0.5);
-        let math_floor = add_textured(materials, &floor_tex, COLOR_MATH, 0.7);
-        let history_floor = add_textured(materials, &floor_tex, COLOR_HISTORY, 0.7);
-        let cs_floor = add_textured(materials, &floor_tex, COLOR_CS, 0.7);
+        let floor = add_textured_pbr(materials, &floor_tex, Color::WHITE, 0.55, 0.0);
+        let ground = add_textured_pbr(materials, &grass_tex, Color::WHITE, 0.95, 0.0);
+        let blackboard = add_textured_pbr(materials, &blackboard_tex, Color::WHITE, 0.75, 0.0);
+        let math_floor = add_textured_pbr(materials, &floor_tex, COLOR_MATH, 0.55, 0.0);
+        let history_floor = add_textured_pbr(materials, &floor_tex, COLOR_HISTORY, 0.55, 0.0);
+        let cs_floor = add_textured_pbr(materials, &floor_tex, COLOR_CS, 0.55, 0.0);
 
-        let door = add_textured(materials, &wood_tex, Color::srgb(0.58, 0.38, 0.22), 0.6);
-        let desk = add_textured(materials, &wood_tex, Color::srgb(0.64, 0.48, 0.30), 0.6);
-        let math_accent = add_solid(materials, COLOR_MATH, 0.8);
-        let history_accent = add_solid(materials, COLOR_HISTORY, 0.8);
-        let cs_accent = add_solid(materials, COLOR_CS, 0.8);
-        let roof = add_solid(materials, Color::srgb(0.32, 0.33, 0.37), 0.8);
-        let cement = add_solid(materials, Color::srgb(0.62, 0.62, 0.60), 0.9);
-        let trunk = add_solid(materials, Color::srgb(0.40, 0.28, 0.16), 0.8);
-        let foliage = add_solid(materials, Color::srgb(0.22, 0.48, 0.24), 0.9);
-        let metal = add_solid(materials, Color::srgb(0.25, 0.25, 0.28), 0.4);
-        let frame = add_textured(materials, &wood_tex, Color::srgb(0.55, 0.42, 0.26), 0.7);
-        let planter = add_solid(materials, Color::srgb(0.72, 0.38, 0.24), 0.9);
-        let banner = add_solid(materials, Color::srgb(0.20, 0.42, 0.30), 0.8);
+        let door = add_textured_pbr(
+            materials,
+            &wood_tex,
+            Color::srgb(0.58, 0.38, 0.22),
+            0.62,
+            0.0,
+        );
+        let desk = add_textured_pbr(
+            materials,
+            &wood_tex,
+            Color::srgb(0.64, 0.48, 0.30),
+            0.60,
+            0.0,
+        );
+        let math_accent = add_solid_pbr(materials, COLOR_MATH, 0.65, 0.0);
+        let history_accent = add_solid_pbr(materials, COLOR_HISTORY, 0.65, 0.0);
+        let cs_accent = add_solid_pbr(materials, COLOR_CS, 0.65, 0.0);
+        let roof = add_textured_pbr(
+            materials,
+            &roof_tex,
+            Color::srgb(0.55, 0.32, 0.28),
+            0.72,
+            0.0,
+        );
+        let cement = add_solid_pbr(materials, Color::srgb(0.62, 0.62, 0.60), 0.82, 0.0);
+        let trunk = add_solid_pbr(materials, Color::srgb(0.40, 0.28, 0.16), 0.85, 0.0);
+        let foliage = add_solid_pbr(materials, Color::srgb(0.22, 0.48, 0.24), 0.90, 0.0);
+        let metal = materials.add(StandardMaterial {
+            base_color: Color::srgb(0.32, 0.33, 0.36),
+            perceptual_roughness: 0.28,
+            metallic: 0.85,
+            ..default()
+        });
+        let frame = add_textured_pbr(
+            materials,
+            &wood_tex,
+            Color::srgb(0.55, 0.42, 0.26),
+            0.65,
+            0.0,
+        );
+        let planter = add_solid_pbr(materials, Color::srgb(0.72, 0.38, 0.24), 0.88, 0.0);
+        let banner = add_solid_pbr(materials, Color::srgb(0.20, 0.42, 0.30), 0.80, 0.0);
 
         let lamp = materials.add(StandardMaterial {
             base_color: Color::srgb(0.40, 0.37, 0.30),
@@ -165,21 +204,22 @@ impl Palette {
             emissive_exposure_weight: 0.6,
             ..default()
         });
-        let cork = add_solid(materials, Color::srgb(0.68, 0.50, 0.28), 0.9);
-        let flower_red = add_solid(materials, Color::srgb(0.90, 0.25, 0.25), 0.8);
-        let flower_yellow = add_solid(materials, Color::srgb(0.95, 0.80, 0.25), 0.8);
-        let flower_purple = add_solid(materials, Color::srgb(0.65, 0.40, 0.85), 0.8);
-        let cloud = add_solid(materials, Color::srgb(0.96, 0.97, 1.0), 1.0);
+        let cork = add_solid_pbr(materials, Color::srgb(0.68, 0.50, 0.28), 0.88, 0.0);
+        let flower_red = add_solid_pbr(materials, Color::srgb(0.90, 0.25, 0.25), 0.72, 0.0);
+        let flower_yellow = add_solid_pbr(materials, Color::srgb(0.95, 0.80, 0.25), 0.72, 0.0);
+        let flower_purple = add_solid_pbr(materials, Color::srgb(0.65, 0.40, 0.85), 0.72, 0.0);
+        let cloud = add_solid_pbr(materials, Color::srgb(0.96, 0.97, 1.0), 1.0, 0.0);
         let panel = materials.add(StandardMaterial {
             base_color: Color::srgb(0.96, 0.96, 0.90),
             emissive: LinearRgba::new(1.0, 0.95, 0.80, 1.0),
             emissive_exposure_weight: 1.6,
             ..default()
         });
-        let goal = add_solid(materials, Color::srgb(0.96, 0.96, 0.94), 0.4);
+        let goal = add_solid_pbr(materials, Color::srgb(0.96, 0.96, 0.94), 0.35, 0.0);
         let glass = materials.add(StandardMaterial {
-            base_color: Color::srgba(0.70, 0.88, 0.98, 0.35),
-            perceptual_roughness: 0.1,
+            base_color: Color::srgba(0.78, 0.90, 0.99, 0.28),
+            perceptual_roughness: 0.08,
+            metallic: 0.1,
             alpha_mode: AlphaMode::Blend,
             ..default()
         });
@@ -189,6 +229,15 @@ impl Palette {
             emissive_exposure_weight: 1.4,
             ..default()
         });
+        let stone = add_textured_pbr(
+            materials,
+            &stone_tex,
+            Color::srgb(0.78, 0.76, 0.74),
+            0.88,
+            0.0,
+        );
+        let curb = add_solid_pbr(materials, Color::srgb(0.68, 0.67, 0.66), 0.78, 0.0);
+        let skirting = add_solid_pbr(materials, Color::srgb(0.82, 0.78, 0.72), 0.75, 0.0);
 
         Self {
             ground,
@@ -224,36 +273,60 @@ impl Palette {
             panel,
             goal,
             glass,
+            stone,
+            curb,
+            skirting,
         }
     }
 }
 
-/// Crea un material opaco con un color sólido.
+/// Crea un material opaco PBR con roughness y metallic explícitos.
+fn add_solid_pbr(
+    materials: &mut Assets<StandardMaterial>,
+    color: Color,
+    roughness: f32,
+    metallic: f32,
+) -> Handle<StandardMaterial> {
+    materials.add(StandardMaterial {
+        base_color: color,
+        perceptual_roughness: roughness,
+        metallic,
+        ..default()
+    })
+}
+#[allow(dead_code)]
 fn add_solid(
     materials: &mut Assets<StandardMaterial>,
     color: Color,
     roughness: f32,
 ) -> Handle<StandardMaterial> {
+    add_solid_pbr(materials, color, roughness, 0.0)
+}
+
+/// Crea un material con textura PBR.
+fn add_textured_pbr(
+    materials: &mut Assets<StandardMaterial>,
+    texture: &Handle<Image>,
+    color: Color,
+    roughness: f32,
+    metallic: f32,
+) -> Handle<StandardMaterial> {
     materials.add(StandardMaterial {
         base_color: color,
+        base_color_texture: Some(texture.clone()),
         perceptual_roughness: roughness,
+        metallic,
         ..default()
     })
 }
-
-/// Crea un material con textura (el color base se multiplica por la textura).
+#[allow(dead_code)]
 fn add_textured(
     materials: &mut Assets<StandardMaterial>,
     texture: &Handle<Image>,
     color: Color,
     roughness: f32,
 ) -> Handle<StandardMaterial> {
-    materials.add(StandardMaterial {
-        base_color: color,
-        base_color_texture: Some(texture.clone()),
-        perceptual_roughness: roughness,
-        ..default()
-    })
+    add_textured_pbr(materials, texture, color, roughness, 0.0)
 }
 
 /// Construye el colegio completo.
@@ -272,9 +345,12 @@ fn build_school(
     spawn_outer_walls(&mut commands, &mut meshes, &palette);
     spawn_classroom_walls(&mut commands, &mut meshes, &palette);
     spawn_roof(&mut commands, &mut meshes, &palette);
+    spawn_facade_details(&mut commands, &mut meshes, &palette);
     spawn_doors(&mut commands, &mut meshes, &palette);
     spawn_windows(&mut commands, &mut meshes, &palette);
     spawn_floor_accents(&mut commands, &mut meshes, &palette);
+    spawn_skirting(&mut commands, &mut meshes, &palette);
+    spawn_ceiling_beams(&mut commands, &mut meshes, &palette);
     spawn_furniture(&mut commands, &mut meshes, &mut materials, &palette);
     spawn_entrance_path(&mut commands, &mut meshes, &palette);
     spawn_lamps(&mut commands, &mut meshes, &palette);
@@ -476,16 +552,137 @@ fn spawn_classroom_walls(
     }
 }
 
-/// Techo del edificio: tapa el interior y sobresale ligeramente de las
-/// paredes, dejando de verse el cielo desde dentro de las aulas.
+/// Techo con teja cerámica + cornisa y alero fotorealista.
 fn spawn_roof(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, palette: &Palette) {
+    // Losa principal con textura de teja.
     spawn_solid(
         commands,
         meshes,
         &palette.roof,
         Vec3::new(0.0, WALL_HEIGHT + 0.125, 0.5),
-        Vec3::new(BUILDING_HALF_X * 2.0 + 1.2, 0.25, RECEPTION_FRONT_Z - BACK_WALL_Z + 1.0),
+        Vec3::new(BUILDING_HALF_X * 2.0 + 1.4, 0.28, RECEPTION_FRONT_Z - BACK_WALL_Z + 1.4),
     );
+    // Cornisa perimetral (moldura que sobresale).
+    spawn_box(
+        commands,
+        meshes,
+        &palette.stone,
+        Vec3::new(0.0, WALL_HEIGHT + 0.02, 0.5),
+        Vec3::new(BUILDING_HALF_X * 2.0 + 1.6, 0.12, RECEPTION_FRONT_Z - BACK_WALL_Z + 1.6),
+    );
+}
+
+/// Detalles de fachada fotorealista: zócalo de piedra, bordillo perimetral y
+/// moldura bajo cubierta. Low-poly pero con materiales PBR que dan profundidad.
+fn spawn_facade_details(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    palette: &Palette,
+) {
+    let t = WALL_THICKNESS;
+    // Zócalo de piedra en la base de todas las paredes exteriores (0.5m alto).
+    // Trasera
+    spawn_box(
+        commands,
+        meshes,
+        &palette.stone,
+        Vec3::new(0.0, 0.25, BACK_WALL_Z),
+        Vec3::new(BUILDING_HALF_X * 2.0 + 0.2, 0.5, t + 0.06),
+    );
+    // Laterales
+    let depth = RECEPTION_FRONT_Z - BACK_WALL_Z;
+    for x in [-BUILDING_HALF_X, BUILDING_HALF_X] {
+        spawn_box(
+            commands,
+            meshes,
+            &palette.stone,
+            Vec3::new(x, 0.25, (BACK_WALL_Z + RECEPTION_FRONT_Z) / 2.0),
+            Vec3::new(t + 0.06, 0.5, depth),
+        );
+    }
+    // Frontal (dos tramos, respeta la entrada)
+    let half_entrance = ENTRANCE_WIDTH / 2.0;
+    let side_width = BUILDING_HALF_X - half_entrance;
+    for sign in [-1.0, 1.0] {
+        spawn_box(
+            commands,
+            meshes,
+            &palette.stone,
+            Vec3::new(
+                sign * (BUILDING_HALF_X + half_entrance) / 2.0,
+                0.25,
+                RECEPTION_FRONT_Z,
+            ),
+            Vec3::new(side_width, 0.5, t + 0.06),
+        );
+    }
+    // Bordillo perimetral exterior (acera).
+    spawn_box(
+        commands,
+        meshes,
+        &palette.curb,
+        Vec3::new(0.0, 0.04, RECEPTION_FRONT_Z + 0.8),
+        Vec3::new(BUILDING_HALF_X * 2.0 + 2.0, 0.08, 0.18),
+    );
+}
+
+/// Rodapié interior en aulas, pasillo y recepción.
+fn spawn_skirting(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, palette: &Palette) {
+    let h = 0.10;
+    let y = 0.06;
+    let th = 0.04;
+    // Perímetro interior aulas (trasera + laterales)
+    for (cx, z0, z1) in [
+        (-8.0, BACK_WALL_Z, CLASSROOM_FRONT_Z),
+        (0.0, BACK_WALL_Z, CLASSROOM_FRONT_Z),
+        (8.0, BACK_WALL_Z, CLASSROOM_FRONT_Z),
+    ] {
+        // Trasera
+        spawn_box(
+            commands,
+            meshes,
+            &palette.skirting,
+            Vec3::new(cx, y, BACK_WALL_Z + th / 2.0),
+            Vec3::new(7.8, h, th),
+        );
+        // Laterales de cada aula
+        for sx in [cx - 3.9, cx + 3.9] {
+            spawn_box(
+                commands,
+                meshes,
+                &palette.skirting,
+                Vec3::new(sx, y, (z0 + z1) / 2.0),
+                Vec3::new(th, h, z1 - z0),
+            );
+        }
+    }
+}
+
+/// Vigas de techo vistas (low-poly) en pasillo y aulas.
+fn spawn_ceiling_beams(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    palette: &Palette,
+) {
+    // 2 vigas por aula + 2 en pasillo/recepción
+    for (x, z) in [
+        (-8.0, -6.0),
+        (-8.0, -2.0),
+        (0.0, -6.0),
+        (0.0, -2.0),
+        (8.0, -6.0),
+        (8.0, -2.0),
+        (0.0, 3.0),
+        (0.0, 8.0),
+    ] {
+        spawn_box(
+            commands,
+            meshes,
+            &palette.frame,
+            Vec3::new(x, 3.05, z),
+            Vec3::new(7.4, 0.12, 0.14),
+        );
+    }
 }
 
 /// Puerta deslizante que el jugador puede abrir/cerrar con la tecla E
@@ -563,7 +760,8 @@ fn spawn_doors(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, palet
     });
 }
 
-/// Ventanas simples en la pared trasera, con marco blanco.
+/// Ventanas fotorealistas low-poly: cristal PBR, marco con profundidad,
+/// cruz interior y alféizar de piedra.
 fn spawn_windows(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, palette: &Palette) {
     let win_w = 1.6;
     let win_h = 1.2;
@@ -572,32 +770,64 @@ fn spawn_windows(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, pal
     for cx in [-8.0, 0.0, 8.0] {
         for dx in [-2.4, 2.4] {
             let x = cx + dx;
+            // Cristal
+            spawn_box(
+                commands,
+                meshes,
+                &palette.glass,
+                Vec3::new(x, win_y, win_z),
+                Vec3::new(win_w, win_h, 0.06),
+            );
+            // Reflejo interior sutil (segundo plano emisivo muy tenue)
             spawn_box(
                 commands,
                 meshes,
                 &palette.window,
-                Vec3::new(x, win_y, win_z),
-                Vec3::new(win_w, win_h, 0.08),
+                Vec3::new(x, win_y, win_z + 0.02),
+                Vec3::new(win_w - 0.1, win_h - 0.1, 0.02),
             );
-            // Marcos: dos listones verticales y dos horizontales.
+            // Marco exterior (4 listones con grosor)
             for mx in [x - win_w / 2.0, x + win_w / 2.0] {
                 spawn_box(
                     commands,
                     meshes,
-                    &palette.wall,
-                    Vec3::new(mx, win_y, win_z),
-                    Vec3::new(0.08, win_h + 0.12, 0.1),
+                    &palette.frame,
+                    Vec3::new(mx, win_y, win_z + 0.04),
+                    Vec3::new(0.10, win_h + 0.14, 0.12),
                 );
             }
             for my in [win_y - win_h / 2.0, win_y + win_h / 2.0] {
                 spawn_box(
                     commands,
                     meshes,
-                    &palette.wall,
-                    Vec3::new(x, my, win_z),
-                    Vec3::new(win_w + 0.12, 0.08, 0.1),
+                    &palette.frame,
+                    Vec3::new(x, my, win_z + 0.04),
+                    Vec3::new(win_w + 0.14, 0.10, 0.12),
                 );
             }
+            // Cruz interior (parteluz)
+            spawn_box(
+                commands,
+                meshes,
+                &palette.frame,
+                Vec3::new(x, win_y, win_z + 0.05),
+                Vec3::new(0.06, win_h, 0.04),
+            );
+            spawn_box(
+                commands,
+                meshes,
+                &palette.frame,
+                Vec3::new(x, win_y, win_z + 0.05),
+                Vec3::new(win_w, 0.06, 0.04),
+            );
+            // Alféizar de piedra
+            spawn_box(
+                commands,
+                meshes,
+                &palette.stone,
+                Vec3::new(x, win_y - win_h / 2.0 - 0.08, win_z + 0.08),
+                Vec3::new(win_w + 0.3, 0.08, 0.14),
+            );
         }
     }
 }
@@ -671,15 +901,37 @@ fn spawn_furniture(
             Vec3::new(cx, 0.35, -7.6),
             Vec3::new(1.2, 0.7, 0.6),
         );
-        // Pupitres en dos columnas.
+        // Pupitres low-poly fotorealistas: tablero + 4 patas metálicas + travesaño.
         for dx in [-2.0, 2.0] {
             for dz in [-5.2, -3.6] {
-                spawn_solid(
+                let px = cx + dx;
+                // Tablero (colisión principal)
+                commands.spawn((
+                    Mesh3d(meshes.add(Cuboid::new(0.85, 0.06, 0.55))),
+                    MeshMaterial3d(palette.desk.clone()),
+                    Transform::from_xyz(px, 0.68, dz),
+                    Collider::new(Vec3::new(0.425, 0.34, 0.275)),
+                ));
+                // Patas metálicas
+                for (lx, lz) in [
+                    (-0.32, -0.18),
+                    (0.32, -0.18),
+                    (-0.32, 0.18),
+                    (0.32, 0.18),
+                ] {
+                    commands.spawn((
+                        Mesh3d(meshes.add(Cylinder::new(0.025, 0.68))),
+                        MeshMaterial3d(palette.metal.clone()),
+                        Transform::from_xyz(px + lx, 0.34, dz + lz),
+                    ));
+                }
+                // Travesaño
+                spawn_box(
                     commands,
                     meshes,
-                    &palette.desk,
-                    Vec3::new(cx + dx, 0.35, dz),
-                    Vec3::new(0.8, 0.7, 0.5),
+                    &palette.metal,
+                    Vec3::new(px, 0.12, dz),
+                    Vec3::new(0.70, 0.04, 0.04),
                 );
             }
         }
@@ -746,33 +998,6 @@ fn spawn_furniture(
         Vec3::new(3.0, 2.0, 9.2),
         Vec3::new(0.8, 0.5, 0.03),
     );
-
-    // Carteles de asignatura sobre cada puerta, con su nombre en texto 3D.
-    let signs = [
-        (-8.0, &palette.math_accent, SUBJECT_MATH),
-        (0.0, &palette.history_accent, SUBJECT_HISTORY),
-        (8.0, &palette.cs_accent, SUBJECT_CS),
-    ];
-    for (cx, material, name) in signs {
-        let sign = commands
-            .spawn((
-                Mesh3d(meshes.add(Cuboid::new(2.2, 0.35, 0.08))),
-                MeshMaterial3d(material.clone()),
-                Transform::from_xyz(cx, 2.75, CLASSROOM_FRONT_Z + 0.21),
-            ))
-            .id();
-        commands.entity(sign).with_children(|parent| {
-            parent.spawn((
-                Text2d::new(name),
-                TextFont {
-                    font_size: 0.16,
-                    ..default()
-                },
-                TextColor(Color::WHITE),
-                Transform::from_xyz(0.0, 0.0, 0.06),
-            ));
-        });
-    }
 }
 
 /// Camino de cemento desde la entrada hacia el exterior (hasta el seto).

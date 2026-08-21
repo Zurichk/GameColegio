@@ -17,36 +17,71 @@
             display: block;
             width: 100vw;
             height: 100vh;
+            outline: none;
         }
         #loading {
             position: fixed;
             inset: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 12px;
             color: #cfe0ff;
             font-family: system-ui, sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.08em;
+            font-size: 1.3rem;
+            letter-spacing: 0.06em;
             z-index: 10;
             background: #05060f;
+            text-align: center;
+            padding: 20px;
         }
-        #loading.hidden {
-            display: none;
+        #loading small {
+            font-size: 0.85rem;
+            color: #8aa0c8;
+            max-width: 560px;
         }
+        #loading.hidden { display: none; }
     </style>
 </head>
 <body>
-    <div id="loading">Cargando Game Colegio…</div>
+    <div id="loading">
+        <div>Cargando Game Colegio…</div>
+        <small id="loading-detail">Inicializando WebAssembly</small>
+    </div>
     <script type="module">
         import init from "./gamecolegio.js";
 
-        async function main() {
+        // Diagnóstico previo de WebGL2 (Bevy lo exige)
+        function hasWebGL2() {
             try {
+                const c = document.createElement("canvas");
+                return !!c.getContext("webgl2");
+            } catch { return false; }
+        }
+
+        async function main() {
+            const detail = document.getElementById("loading-detail");
+            if (!hasWebGL2()) {
+                document.getElementById("loading").innerHTML =
+                    '<div>Tu navegador no soporta WebGL2</div><small>Actualiza Chrome/Firefox/Edge a la última versión y activa aceleración por hardware.</small>';
+                return;
+            }
+            try {
+                detail.textContent = "Descargando WASM…";
+                // `init()` hace fetch + compile streaming. Si el servidor no sirve
+                // application/wasm, el navegador lo rechaza (nginx.conf ya lo fija).
                 await init();
+                document.getElementById("loading").classList.add("hidden");
             } catch (err) {
-                document.getElementById("loading").textContent =
-                    "No se pudo iniciar el juego (¿WebGL2 no disponible?): " + err;
+                console.error(err);
+                const msg = String(err && err.message ? err.message : err);
+                // Mensaje específico para el bug de Table.grow
+                const hint = msg.includes("Table.grow") || msg.includes("table")
+                    ? "<br><small>Error de tabla WASM — recompila con <code>getrandom wasm_js</code> (ya parcheado). Haz hard-refresh (Ctrl+F5).</small>"
+                    : "";
+                document.getElementById("loading").innerHTML =
+                    '<div>No se pudo iniciar el juego</div><small style="color:#ffb4b4;word-break:break-word">' + msg + '</small>' + hint;
             }
         }
         main();

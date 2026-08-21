@@ -13,6 +13,12 @@ rand = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
+# getrandom con backend wasm_js SOLO para WASM (evita romper el build nativo
+# en Windows con MinGW viejo — el dlltool de C:\MinGW no soporta x86-64).
+# En nativo Bevy usa el backend windows nativo; en wasm usa wasm_js.
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
 # Perfil de release optimizado para la compilación WebAssembly (Docker/Coolify):
 # - opt-level 2 compila mucho más rápido que 3 (Bevy es enorme) con una
 #   pérdida de rendimiento mínima para un juego educativo.

@@ -34,7 +34,7 @@ impl Plugin for WorldPlugin {
         app.add_plugins((SchoolPlugin, TeacherPlugin, DialogPlugin, QuizPlugin))
             .insert_resource(AmbientLight {
                 color: Color::srgb(0.98, 0.97, 0.95),
-                brightness: 220.0,
+                brightness: 280.0,
                 ..default()
             })
             .add_systems(Startup, (setup_lighting, spawn_door_prompt))
@@ -166,19 +166,28 @@ fn update_door_prompt(
     }
 }
 
-/// Crea la iluminación principal de la escena.
+/// Crea la iluminación PBR fotorealista: sol con cascadas + interiores con sombras.
 fn setup_lighting(mut commands: Commands) {
-    // Sol direccional con sombras.
+    use bevy::pbr::CascadeShadowConfigBuilder;
+
+    // Sol direccional con sombras en cascada (4k, filtrado suave).
     commands.spawn((
         DirectionalLight {
-            illuminance: 20_000.0,
+            illuminance: 28_000.0,
             shadows_enabled: true,
             ..default()
         },
+        CascadeShadowConfigBuilder {
+            num_cascades: 4,
+            first_cascade_far_bound: 8.0,
+            maximum_distance: 80.0,
+            ..default()
+        }
+        .build(),
         Transform::from_rotation(Quat::from_euler(EulerRot::XYZ, -1.0, -0.5, 0.0)),
     ));
 
-    // Luces cálidas de interior: una por aula, más pasillo y recepción.
+    // Luces cálidas de interior — ahora con sombras y mayor intensidad.
     let interior_lights = [
         (-8.0, 2.8, -4.5), // Aula de Matemáticas.
         (0.0, 2.8, -4.5),  // Aula de Historia.
@@ -189,9 +198,11 @@ fn setup_lighting(mut commands: Commands) {
     for (x, y, z) in interior_lights {
         commands.spawn((
             PointLight {
-                intensity: 2500.0,
-                range: 16.0,
+                intensity: 9_000.0,
+                range: 20.0,
+                radius: 0.15,
                 color: Color::srgb(1.0, 0.95, 0.85),
+                shadows_enabled: true,
                 ..default()
             },
             Transform::from_xyz(x, y, z),
