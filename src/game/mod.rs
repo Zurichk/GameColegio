@@ -102,6 +102,30 @@ pub enum GameState {
     Connect4Game,
     /// Hundir la flota.
     BattleshipGame,
+    /// La Oca.
+    OcaGame,
+    /// Parchís.
+    ParchisGame,
+    /// Ruleta de la Fortuna.
+    RouletteGame,
+    /// Cifras y Letras.
+    CountdownGame,
+    /// Buscaminas.
+    MinesweeperGame,
+    /// Snake.
+    SnakeGame,
+    /// Damas.
+    CheckersGame,
+    /// Bingo.
+    BingoGame,
+    /// Ajedrez.
+    ChessGame,
+    /// Dominó.
+    DominoGame,
+    /// Uno.
+    UnoGame,
+    /// Quiz competitivo.
+    QuizCompetitiveGame,
     /// Menú de los juegos de memoria.
     MemoryMenu,
     /// Juego de memoria (emparejar tarjetas) en curso.

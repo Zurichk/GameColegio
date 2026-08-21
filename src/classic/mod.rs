@@ -4,7 +4,15 @@
 //! - Cada juego es un overlay de UI a pantalla completa (como `learning`).
 
 pub mod battleship;
+pub mod bingo;
+pub mod checkers;
+pub mod cifras_letras;
 pub mod connect4;
+pub mod minesweeper;
+pub mod oca;
+pub mod parchis;
+pub mod roulette;
+pub mod snake;
 pub mod tictactoe;
 
 use bevy::prelude::*;
@@ -22,6 +30,16 @@ impl Plugin for ClassicPlugin {
             tictactoe::TicTacToePlugin,
             connect4::Connect4Plugin,
             battleship::BattleshipPlugin,
+            oca::OcaPlugin,
+            parchis::ParchisPlugin,
+            roulette::RoulettePlugin,
+            cifras_letras::CountdownPlugin,
+        ));
+        app.add_plugins((
+            minesweeper::MinesweeperPlugin,
+            snake::SnakePlugin,
+            checkers::CheckersPlugin,
+            bingo::BingoPlugin,
         ))
         .add_systems(OnEnter(GameState::ClassicMenu), spawn_classic_menu)
         .add_systems(OnExit(GameState::ClassicMenu), despawn_classic_menu)
@@ -37,6 +55,22 @@ pub struct TicTacToeButton;
 pub struct Connect4Button;
 #[derive(Component)]
 pub struct BattleshipButton;
+#[derive(Component)]
+pub struct OcaButton;
+#[derive(Component)]
+pub struct ParchisButton;
+#[derive(Component)]
+pub struct RouletteButton;
+#[derive(Component)]
+pub struct CountdownButton;
+#[derive(Component)]
+pub struct MinesweeperButton;
+#[derive(Component)]
+pub struct SnakeButton;
+#[derive(Component)]
+pub struct CheckersButton;
+#[derive(Component)]
+pub struct BingoButton;
 #[derive(Component)]
 pub struct ClassicBackButton;
 
@@ -72,6 +106,14 @@ fn spawn_classic_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             spawn_button(root, "Tres en Raya", TicTacToeButton, &font);
             spawn_button(root, "Conecta 4", Connect4Button, &font);
             spawn_button(root, "Hundir la Flota (5×5)", BattleshipButton, &font);
+            spawn_button(root, "La Oca", OcaButton, &font);
+            spawn_button(root, "Parchís", ParchisButton, &font);
+            spawn_button(root, "Ruleta de la Fortuna", RouletteButton, &font);
+            spawn_button(root, "Cifras y Letras", CountdownButton, &font);
+            spawn_button(root, "Buscaminas", MinesweeperButton, &font);
+            spawn_button(root, "Snake", SnakeButton, &font);
+            spawn_button(root, "Damas", CheckersButton, &font);
+            spawn_button(root, "Bingo", BingoButton, &font);
             root.spawn(Node { height: Val::Px(14.0), ..default() });
             spawn_button(root, "Volver al menú principal", ClassicBackButton, &font);
         });
@@ -86,13 +128,13 @@ fn despawn_classic_menu(mut commands: Commands, roots: Query<Entity, With<Classi
 fn classic_menu_input(
     keys: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
-    interactions: Query<(&Interaction, Option<&TicTacToeButton>, Option<&Connect4Button>, Option<&BattleshipButton>, Option<&ClassicBackButton>), Changed<Interaction>>,
+    interactions: Query<(&Interaction, Option<&TicTacToeButton>, Option<&Connect4Button>, Option<&BattleshipButton>, Option<&OcaButton>, Option<&ParchisButton>, Option<&RouletteButton>, Option<&CountdownButton>, Option<&MinesweeperButton>, Option<&SnakeButton>, Option<&CheckersButton>, Option<&BingoButton>, Option<&ClassicBackButton>), Changed<Interaction>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) {
         next_state.set(GameState::MainMenu);
         return;
     }
-    for (interaction, ttt, c4, bs, back) in &interactions {
+    for (interaction, ttt, c4, bs, oca, parchis, roulette, countdown, mines, snake, checkers, bingo, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
@@ -102,6 +144,22 @@ fn classic_menu_input(
             next_state.set(GameState::Connect4Game);
         } else if bs.is_some() {
             next_state.set(GameState::BattleshipGame);
+        } else if oca.is_some() {
+            next_state.set(GameState::OcaGame);
+        } else if parchis.is_some() {
+            next_state.set(GameState::ParchisGame);
+        } else if roulette.is_some() {
+            next_state.set(GameState::RouletteGame);
+        } else if countdown.is_some() {
+            next_state.set(GameState::CountdownGame);
+        } else if mines.is_some() {
+            next_state.set(GameState::MinesweeperGame);
+        } else if snake.is_some() {
+            next_state.set(GameState::SnakeGame);
+        } else if checkers.is_some() {
+            next_state.set(GameState::CheckersGame);
+        } else if bingo.is_some() {
+            next_state.set(GameState::BingoGame);
         } else if back.is_some() {
             next_state.set(GameState::MainMenu);
         }
