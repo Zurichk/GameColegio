@@ -6,6 +6,9 @@ node_modules/
 # Archivos de guardado locales (no deben entrar en la imagen)
 savegame.json
 
+# Cargo local de Windows (linker absoluto) — nunca debe entrar en la imagen Linux
+.cargo/
+
 # Control de versiones e IDE
 .git/
 .gitignore
@@ -14,6 +17,9 @@ savegame.json
 
 # Documentación local
 docs/
+
+# Salida generada localmente (la genera el Dockerfile con wasm-bindgen)
+web/
 
 # No recompilar desde la imagen: los .wav generados ya están en assets/sfx
 # y se copian tal cual.
