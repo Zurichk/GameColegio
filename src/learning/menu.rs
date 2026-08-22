@@ -51,6 +51,10 @@ pub struct LearningBackButton;
 #[derive(Component)]
 pub struct LanguageMenuUi;
 
+/// Botón de leer en mayúsculas (inicio lectura).
+#[derive(Component)]
+pub struct UppercaseButton;
+
 /// Botón de empezar la práctica de leer y escribir.
 #[derive(Component)]
 pub struct ReadingButton;
@@ -362,6 +366,7 @@ fn spawn_language_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 height: Val::Px(14.0),
                 ..default()
             });
+            spawn_button(root, "Leer en MAYÚSCULAS", UppercaseButton, &font);
             spawn_button(root, "Leer y escribir", ReadingButton, &font);
             spawn_button(root, "Ortografía", SpellingButton, &font);
             spawn_button(root, "Ahorcado", HangmanButton, &font);
@@ -390,6 +395,7 @@ fn language_menu_input(
     interactions: Query<
         (
             &Interaction,
+            Option<&UppercaseButton>,
             Option<&ReadingButton>,
             Option<&SpellingButton>,
             Option<&HangmanButton>,
@@ -405,11 +411,13 @@ fn language_menu_input(
         next_state.set(GameState::LearningMenu);
         return;
     }
-    for (interaction, reading, spelling, hangman, synonyms, anagram, vocab, back) in &interactions {
+    for (interaction, uppercase, reading, spelling, hangman, synonyms, anagram, vocab, back) in &interactions {
         if *interaction != Interaction::Pressed {
             continue;
         }
-        if reading.is_some() {
+        if uppercase.is_some() {
+            next_state.set(GameState::UppercasePractice);
+        } else if reading.is_some() {
             next_state.set(GameState::ReadingPractice);
         } else if spelling.is_some() {
             next_state.set(GameState::SpellingPractice);

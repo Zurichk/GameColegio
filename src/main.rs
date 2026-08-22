@@ -69,7 +69,19 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Game Colegio".to_string(),
-                        resolution: (1600.0_f32, 900.0_f32).into(),
+                        // Resolución base 1280x720; en WASM se ajusta al
+                        // tamaño del navegador gracias a `fit_canvas_to_parent`
+                        // (recomendado por Bevy #20164). En nativo sigue
+                        // siendo redimensionable.
+                        resolution: (1280.0_f32, 720.0_f32).into(),
+                        resizable: true,
+                        // En web Bevy busca este canvas en el DOM y adapta
+                        // su tamaño al padre. El HTML debe tener
+                        // <canvas id="bevy"> dentro de un contenedor con
+                        // width/height 100% (ver index.html).
+                        canvas: Some("#bevy".into()),
+                        fit_canvas_to_parent: true,
+                        prevent_default_event_handling: false,
                         ..default()
                     }),
                     ..default()

@@ -1,5 +1,10 @@
 {
   "sensitivity": 5.0,
   "volume": 80.0,
-  "language": "Es"
+  "language": "Es",
+  "video": {
+    "fullscreen": false,
+    "vsync": true,
+    "ui_scale": 0.9
+  }
 }

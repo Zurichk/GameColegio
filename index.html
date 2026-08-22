@@ -2,22 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Game Colegio</title>
     <style>
         html,
         body {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
             background: #05060f;
             overflow: hidden;
+            /* Evita scroll elástico en móvil */
+            overscroll-behavior: none;
+            touch-action: none;
         }
-        canvas {
-            display: block;
-            width: 100vw;
+        /* Contenedor que ocupa toda la ventana; Bevy ajusta el canvas a su tamaño
+           gracias a `fit_canvas_to_parent: true` + `canvas: "#bevy"` en main.rs.
+           Esto evita el feedback loop (el padre no depende del tamaño del hijo). */
+        #wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100dvh; /* dvh para barras móviles */
             height: 100vh;
+            overflow: hidden;
+        }
+        canvas#bevy {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
             outline: none;
+            /* Mantiene proporción; Bevy renderiza al tamaño físico del canvas */
+            object-fit: contain;
         }
         #loading {
             position: fixed;
@@ -45,12 +65,16 @@
     </style>
 </head>
 <body>
+    <div id="wrap">
+        <!-- Bevy lo busca via `canvas: "#bevy"` y lo redimensiona al tamaño de #wrap -->
+        <canvas id="bevy" tabindex="0" data-raw-handle="1" alt="Game Colegio"></canvas>
+    </div>
     <div id="loading">
         <div>Cargando Game Colegio…</div>
         <small id="loading-detail">Inicializando WebAssembly</small>
     </div>
     <script type="module">
-        import init from "./gamecolegio.js?v=4";
+        import init from "./gamecolegio.js?v=5";
 
         // Diagnóstico previo de WebGL2 (Bevy lo exige)
         function hasWebGL2() {
@@ -67,16 +91,21 @@
                     '<div>Tu navegador no soporta WebGL2</div><small>Actualiza Chrome/Firefox/Edge a la última versión y activa aceleración por hardware.</small>';
                 return;
             }
+            // Click en el canvas para recuperar foco (importante en móvil)
+            const canvas = document.getElementById("bevy");
+            if (canvas) {
+                canvas.addEventListener("click", () => canvas.focus());
+            }
             try {
                 detail.textContent = "Descargando WASM…";
                 // `init()` hace fetch + compile streaming. Si el servidor no sirve
                 // application/wasm, el navegador lo rechaza (nginx.conf ya lo fija).
                 await init();
                 document.getElementById("loading").classList.add("hidden");
+                if (canvas) canvas.focus();
             } catch (err) {
                 console.error(err);
                 const msg = String(err && err.message ? err.message : err);
-                // Orientar sobre el problema de herramientas de optimización WASM.
                 const hint = msg.includes("Table.grow") || msg.includes("table")
                     ? "<br><small>Error de tabla WASM — reconstruye la imagen con Binaryen 110 o superior y limpia la caché del navegador.</small>"
                     : "";

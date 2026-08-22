@@ -13,11 +13,17 @@ struct TicTacToeSession {
     turn: char, // 'X' or 'O'
     winner: Option<char>,
     draw: bool,
+    /// true = 1 jugador vs CPU (O es CPU), false = 2 jugadores hotseat
+    vs_cpu: bool,
+    setup_done: bool,
 }
 
 impl TicTacToeSession {
     fn new() -> Self {
-        Self { board: [None; 9], turn: 'X', winner: None, draw: false }
+        Self { board: [None; 9], turn: 'X', winner: None, draw: false, vs_cpu: true, setup_done: false }
+    }
+    fn new_with_mode(vs_cpu: bool) -> Self {
+        Self { board: [None; 9], turn: 'X', winner: None, draw: false, vs_cpu, setup_done: true }
     }
     fn check_winner(&mut self) {
         let lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
@@ -44,6 +50,12 @@ struct TicTacToeCellText(usize);
 struct TicTacToeBackButton;
 #[derive(Component)]
 struct TicTacToeRestartButton;
+#[derive(Component)]
+struct TicTacToeSetupRoot;
+#[derive(Component)]
+struct TicTacToeVsCpuButton;
+#[derive(Component)]
+struct TicTacToeTwoPlayersButton;
 
 pub struct TicTacToePlugin;
 impl Plugin for TicTacToePlugin {
@@ -60,6 +72,17 @@ fn spawn_tictactoe(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((TicTacToeUiRoot, Node { position_type: PositionType::Absolute, width: Val::Percent(100.0), height: Val::Percent(100.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, ..default() }, screen_background(), Visibility::Visible, ZIndex(30)))
         .with_children(|overlay| {
+            // Setup overlay: selección de jugadores (encima del tablero)
+            overlay.spawn((TicTacToeSetupRoot, Node { position_type: PositionType::Absolute, width: Val::Percent(100.0), height: Val::Percent(100.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgba(0.02, 0.04, 0.10, 0.85)), ZIndex(40))).with_children(|setup| {
+                setup.spawn((Node { flex_direction: FlexDirection::Column, width: Val::Px(460.0), padding: UiRect::all(Val::Px(20.0)), row_gap: Val::Px(14.0), align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgba(0.10, 0.14, 0.28, 0.96)), BorderRadius::all(Val::Px(16.0)))).with_children(|panel| {
+                    panel.spawn((Text::new("TRES EN RAYA — Elige modo"), TextFont { font: font.clone(), font_size: 22.0, ..default() }, TextColor(Color::srgb(0.95, 0.85, 0.40))));
+                    panel.spawn((Text::new("¿Cuántos jugadores?"), TextFont { font: font.clone(), font_size: 16.0, ..default() }, TextColor(Color::WHITE)));
+                    panel.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), ..default() }).with_children(|row| {
+                        row.spawn((Button, TicTacToeVsCpuButton, Node { width: Val::Px(180.0), height: Val::Px(44.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(2.0)), ..default() }, BackgroundColor(Color::srgb(0.15, 0.42, 0.25)), BorderColor(Color::srgb(0.60, 0.80, 1.0)), BorderRadius::all(Val::Px(10.0)))).with_children(|b| { b.spawn((Text::new("1 Jugador vs CPU"), TextFont { font: font.clone(), font_size: 14.0, ..default() }, TextColor(Color::WHITE))); });
+                        row.spawn((Button, TicTacToeTwoPlayersButton, Node { width: Val::Px(180.0), height: Val::Px(44.0), justify_content: JustifyContent::Center, align_items: AlignItems::Center, border: UiRect::all(Val::Px(2.0)), ..default() }, BackgroundColor(Color::srgb(0.20, 0.38, 0.66)), BorderColor(Color::srgb(0.60, 0.80, 1.0)), BorderRadius::all(Val::Px(10.0)))).with_children(|b| { b.spawn((Text::new("2 Jugadores"), TextFont { font: font.clone(), font_size: 14.0, ..default() }, TextColor(Color::WHITE))); });
+                    });
+                });
+            });
             overlay.spawn((Node { flex_direction: FlexDirection::Column, width: Val::Px(520.0), padding: UiRect::axes(Val::Px(24.0), Val::Px(20.0)), row_gap: Val::Px(12.0), align_items: AlignItems::Center, ..default() }, BackgroundColor(Color::srgba(0.07, 0.09, 0.18, 0.96)), BorderRadius::all(Val::Px(16.0)))).with_children(|panel| {
                 panel.spawn((TicTacToeText(TicTacToeField::Title), Text::new("TRES EN RAYA"), TextFont { font: font.clone(), font_size: 28.0, ..default() }, TextColor(Color::srgb(0.95, 0.85, 0.40))));
                 panel.spawn((TicTacToeText(TicTacToeField::Status), Text::new("Turno: X"), TextFont { font: font.clone(), font_size: 22.0, ..default() }, TextColor(Color::WHITE)));
@@ -90,10 +113,19 @@ fn update_tictactoe(
     restart_clicks: Query<&Interaction, (Changed<Interaction>, With<TicTacToeRestartButton>)>,
     mut cell_texts: Query<(&TicTacToeCellText, &mut Text), Without<TicTacToeText>>,
     mut status_text: Query<(&TicTacToeText, &mut Text), Without<TicTacToeCellText>>,
+    setup_vs_cpu: Query<&Interaction, (Changed<Interaction>, With<TicTacToeVsCpuButton>)>,
+    setup_two: Query<&Interaction, (Changed<Interaction>, With<TicTacToeTwoPlayersButton>)>,
+    mut setup_root: Query<&mut Visibility, With<TicTacToeSetupRoot>>,
 ) {
     if keys.just_pressed(KeyCode::Escape) { commands.set_state(GameState::ClassicMenu); return; }
     if back_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { commands.set_state(GameState::ClassicMenu); return; }
-    if restart_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { *session = TicTacToeSession::new(); }
+    // Setup: elegir modo antes de jugar
+    if !session.setup_done {
+        for interaction in &setup_vs_cpu { if *interaction == Interaction::Pressed { *session = TicTacToeSession::new_with_mode(true); for mut v in &mut setup_root { *v = Visibility::Hidden; } return; } }
+        for interaction in &setup_two { if *interaction == Interaction::Pressed { *session = TicTacToeSession::new_with_mode(false); for mut v in &mut setup_root { *v = Visibility::Hidden; } return; } }
+        return;
+    }
+    if restart_clicks.single().map_or(false, |i| *i == Interaction::Pressed) { let vs_cpu = session.vs_cpu; *session = TicTacToeSession::new_with_mode(vs_cpu); }
     if session.winner.is_some() || session.draw {
         for (field, mut text) in &mut status_text { if field.0 == TicTacToeField::Status { if let Some(w) = session.winner { *text = Text::new(format!("¡Gana {}!", w)); } else if session.draw { *text = Text::new("¡Empate!"); } } }
         for (cell, mut text) in &mut cell_texts {
@@ -109,7 +141,7 @@ fn update_tictactoe(
             session.check_winner();
             if session.winner.is_none() && !session.draw {
                 session.turn = if session.turn == 'X' { 'O' } else { 'X' };
-                if session.turn == 'O' {
+                if session.turn == 'O' && session.vs_cpu {
                     let empties: Vec<usize> = session.board.iter().enumerate().filter_map(|(i, c)| if c.is_none() { Some(i) } else { None }).collect();
                     if let Some(&choice) = empties.choose(&mut rand::thread_rng()) {
                         session.board[choice] = Some('O');
@@ -122,7 +154,11 @@ fn update_tictactoe(
     }
     for (field, mut text) in &mut status_text {
         if field.0 == TicTacToeField::Status {
-            if let Some(w) = session.winner { *text = Text::new(format!("¡Gana {}!", w)); } else if session.draw { *text = Text::new("¡Empate!"); } else { *text = Text::new(format!("Turno: {}", session.turn)); }
+            if !session.setup_done { *text = Text::new("Elige modo arriba"); }
+            else if let Some(w) = session.winner { *text = Text::new(format!("¡Gana {}!", w)); } else if session.draw { *text = Text::new("¡Empate!"); } else {
+                let suffix = if session.vs_cpu && session.turn == 'O' { " (CPU)" } else if !session.vs_cpu { if session.turn == 'X' { " (J1)" } else { " (J2)" } } else { "" };
+                *text = Text::new(format!("Turno: {}{}", session.turn, suffix));
+            }
         }
     }
     for (cell, mut text) in &mut cell_texts {

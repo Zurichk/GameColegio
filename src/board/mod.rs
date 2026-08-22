@@ -251,6 +251,8 @@ pub struct BoardState {
     pub winner: Option<usize>,
     /// Contador de cambios; la interfaz lo usa para saber cuándo repintar.
     pub revision: u64,
+    /// Dado pendiente de aplicar tras la animación del cubo (1..6).
+    pub pending_dice: Option<u8>,
 }
 
 impl BoardState {
@@ -271,6 +273,7 @@ impl BoardState {
             last_correct: None,
             winner: None,
             revision: 0,
+            pending_dice: None,
         }
     }
 

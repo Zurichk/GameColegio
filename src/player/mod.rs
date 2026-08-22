@@ -187,7 +187,7 @@ fn move_player(
     dialog: Option<Res<DialogSession>>,
     quiz: Option<Res<QuizSession>>,
     camera_q: Query<&ThirdPersonCamera>,
-    walls: Query<(&Transform, &Collider), Without<Player>>,
+    walls: Query<(&GlobalTransform, &Collider), Without<Player>>,
     mut player_q: Query<
         (&mut Transform, &mut PlayerVelocity, &mut OnGround),
         With<Player>,
@@ -196,7 +196,9 @@ fn move_player(
     if dialog.is_some() || quiz.is_some() {
         return;
     }
-    let dt = time.delta_secs();
+    // Limitar el paso evita que un tirón de FPS convierta un solo movimiento
+    // en un salto capaz de atravesar una pared delgada.
+    let dt = time.delta_secs().min(0.05);
     let Ok(camera) = camera_q.single() else {
         return;
     };
@@ -245,7 +247,7 @@ fn move_player(
     let aabbs: Vec<Aabb> = walls
         .iter()
         .map(|(wall_tf, collider)| {
-            Aabb::from_center_half_extents(wall_tf.translation, collider.half_extents)
+            Aabb::from_center_half_extents(wall_tf.translation(), collider.half_extents)
         })
         .collect();
     let resolved = resolve_aabbs(transform.translation, candidate, PLAYER_HALF_EXTENTS, &aabbs);

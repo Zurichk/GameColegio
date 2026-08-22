@@ -22,6 +22,8 @@ const PITCH_LIMIT: f32 = 1.2;
 const MOUSE_SENSITIVITY: f32 = 0.0035;
 /// Factor de suavizado del seguimiento (más alto = más rígido).
 const SMOOTHNESS: f32 = 8.0;
+/// Radio de seguridad de la cámara para no rozar una pared.
+const CAMERA_CLEARANCE: f32 = 0.18;
 
 /// Orientación y parámetros de la cámara en tercera persona.
 #[derive(Component)]
@@ -113,19 +115,47 @@ fn unlock_cursor(mut window: Single<&mut Window>) {
     window.cursor_options.visible = true;
 }
 
+/// Devuelve la primera fracción del segmento que entra en una AABB expandida.
+/// El método de slabs no depende de la densidad de muestreo y no puede saltar
+/// paredes finas entre dos puntos consecutivos.
+fn segment_entry_t(start: Vec3, end: Vec3, box_aabb: &Aabb) -> Option<f32> {
+    let direction = end - start;
+    let mut near: f32 = 0.0;
+    let mut far: f32 = 1.0;
+    for axis in 0..3 {
+        if direction[axis].abs() < f32::EPSILON {
+            if start[axis] < box_aabb.min[axis] || start[axis] > box_aabb.max[axis] {
+                return None;
+            }
+            continue;
+        }
+        let inv_direction = 1.0 / direction[axis];
+        let mut axis_near = (box_aabb.min[axis] - start[axis]) * inv_direction;
+        let mut axis_far = (box_aabb.max[axis] - start[axis]) * inv_direction;
+        if axis_near > axis_far {
+            std::mem::swap(&mut axis_near, &mut axis_far);
+        }
+        near = near.max(axis_near);
+        far = far.min(axis_far);
+        if near > far {
+            return None;
+        }
+    }
+    if far >= 0.0 && near <= 1.0 && near >= 0.0 { Some(near) } else { None }
+}
+
 /// Mueve la cámara alrededor del jugador según el ratón y la sigue suavemente.
 ///
 /// La cámara no atraviesa paredes: si la posición deseada queda dentro de un
 /// collider del mundo (el edificio del colegio, el mobiliario…), se acerca al
-/// jugador muestreando el segmento jugador → deseado hasta hallar el punto más
-/// lejano sin colisión.
+/// jugador hasta el primer impacto continuo del segmento jugador → cámara.
 fn update_camera(
     time: Res<Time>,
     settings: Res<Settings>,
     mut mouse_motion: EventReader<MouseMotion>,
     mut cameras: Query<(&mut Transform, &mut ThirdPersonCamera), Without<Player>>,
     players: Query<&Transform, With<Player>>,
-    walls: Query<(&Transform, &Collider), (Without<Player>, Without<ThirdPersonCamera>)>,
+    walls: Query<(&GlobalTransform, &Collider), (Without<Player>, Without<ThirdPersonCamera>)>,
 ) {
     let Ok(player_tf) = players.single() else {
         return;
@@ -157,27 +187,53 @@ fn update_camera(
     let wall_aabbs: Vec<Aabb> = walls
         .iter()
         .map(|(wall_tf, collider)| {
-            Aabb::from_center_half_extents(wall_tf.translation, collider.half_extents)
+            Aabb::from_center_half_extents(wall_tf.translation(), collider.half_extents)
         })
         .collect();
 
-    // Muestreo del segmento jugador → deseado (16 puntos): el punto más lejano
-    // que no esté dentro de ninguna caja es la posición válida de la cámara.
-    // Así la cámara se pega a la pared en lugar de atravesarla.
-    let mut cam_pos = desired;
-    for step in (0..=16).rev() {
-        let t = step as f32 / 16.0;
-        let probe = target.lerp(desired, t);
-        let cam_aabb = Aabb::from_center_half_extents(probe, Vec3::splat(0.15));
-        if !wall_aabbs.iter().any(|w| w.overlaps(&cam_aabb)) {
-            cam_pos = probe;
-            break;
+    // Intersección continua del segmento con las paredes expandidas por el
+    // radio de la cámara. Se coloca justo antes del primer impacto.
+    let camera_half_extents = Vec3::splat(CAMERA_CLEARANCE);
+    let mut allowed_t: f32 = 1.0;
+    for wall in &wall_aabbs {
+        let expanded = Aabb::from_center_half_extents(
+            (wall.min + wall.max) * 0.5,
+            (wall.max - wall.min) * 0.5 + camera_half_extents,
+        );
+        if let Some(entry_t) = segment_entry_t(target, desired, &expanded) {
+            allowed_t = allowed_t.min((entry_t - 0.01).max(0.0));
         }
     }
+    let cam_pos = target.lerp(desired, allowed_t);
 
     // Seguimiento suave.
     let t = (cam.smoothness * time.delta_secs()).min(1.0);
-    let new_translation = cam_tf.translation.lerp(cam_pos, t);
+    let mut new_translation = cam_tf.translation.lerp(cam_pos, t);
+    let current_aabb = Aabb::from_center_half_extents(new_translation, camera_half_extents);
+    if wall_aabbs.iter().any(|wall| wall.overlaps(&current_aabb)) {
+        new_translation = cam_pos;
+    }
     cam_tf.translation = new_translation;
     cam_tf.look_at(target, Vec3::Y);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::segment_entry_t;
+    use crate::world::collision::Aabb;
+    use bevy::prelude::Vec3;
+
+    #[test]
+    fn segment_detects_thin_wall_without_sampling() {
+        let wall = Aabb::from_center_half_extents(Vec3::ZERO, Vec3::new(0.05, 2.0, 2.0));
+        let entry = segment_entry_t(Vec3::new(-4.0, 1.0, 0.0), Vec3::new(4.0, 1.0, 0.0), &wall);
+        assert!(entry.is_some());
+        assert!((entry.unwrap() - 0.49375).abs() < 0.001);
+    }
+
+    #[test]
+    fn segment_ignores_wall_outside_path() {
+        let wall = Aabb::from_center_half_extents(Vec3::new(0.0, 0.0, 5.0), Vec3::splat(0.5));
+        assert!(segment_entry_t(Vec3::new(-4.0, 1.0, 0.0), Vec3::new(4.0, 1.0, 0.0), &wall).is_none());
+    }
 }

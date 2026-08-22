@@ -10,6 +10,7 @@ use crate::board::{
     BoardState, CellKind, QuestionTimer, TurnPhase, BOARD_STEP, BOARD_SIZE, PLAYER_COLORS,
     RADIO_LEN,
 };
+use crate::classic::dice_anim::{spawn_side_dice, AnimatedDice};
 use crate::game::GameState;
 use crate::i18n::tr;
 
@@ -358,14 +359,13 @@ pub fn spawn_board_ui(
                 });
             });
 
-            // Tablero: radios (debajo) + pista exterior + hub central. El
-            // panel oscuro cubre toda la zona para que no se vea la escena
-            // del colegio detrás (ni el personaje).
-            root.spawn((
+            // Fila con dados laterales + tablero central
+            root.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), align_items: AlignItems::Center, justify_content: JustifyContent::Center, ..default() }).with_children(|row| {
+                spawn_side_dice(row, &font, "DADO");
+                row.spawn((
                 Node {
                     width: Val::Px(BOARD_W),
                     height: Val::Px(BOARD_H),
-                    align_self: AlignSelf::Center,
                     overflow: Overflow::clip(),
                     ..default()
                 },
@@ -587,6 +587,8 @@ pub fn spawn_board_ui(
                             }
                         });
                 }
+                });
+                spawn_side_dice(row, &font, "DADO");
             });
 
             // Capa modal: dirección, Estrellita de salida, pregunta, dado,
@@ -831,6 +833,7 @@ pub fn despawn_board_ui(mut commands: Commands, roots: Query<Entity, With<BoardU
 
 /// Procesa los clics del tablero y avanza la lógica de la partida.
 pub fn board_input(
+    keys: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
     state: Option<ResMut<BoardState>>,
     roll: Query<&Interaction, (Changed<Interaction>, With<RollButton>)>,
@@ -842,14 +845,39 @@ pub fn board_input(
     continue_button: Query<&Interaction, (Changed<Interaction>, With<ContinueButton>)>,
     taboo_guessed: Query<&Interaction, (Changed<Interaction>, With<TabooGuessedButton>)>,
     taboo_miss: Query<&Interaction, (Changed<Interaction>, With<TabooMissButton>)>,
+    mut dice_anim: Query<&mut AnimatedDice>,
 ) {
     let Some(mut state) = state else {
         return;
     };
-    for interaction in &roll {
-        if *interaction == Interaction::Pressed && state.phase == TurnPhase::Roll {
-            state.roll_dice();
+    // Si hay dado pendiente, esperar a que termine la animación antes de aplicar
+    let has_pending = state.pending_dice.is_some();
+    if has_pending {
+        let still_rolling = dice_anim.iter().any(|d| d.rolling);
+        if !still_rolling {
+            if let Some(pending) = state.pending_dice.take() {
+                state.roll_with(pending);
+            }
         }
+        // Mientras rueda no aceptar nueva tirada (pero sí menú)
+        let mut menu_pressed = false;
+        for interaction in &menu {
+            if *interaction == Interaction::Pressed { menu_pressed = true; break; }
+        }
+        if menu_pressed {
+            next_state.set(GameState::MainMenu);
+        }
+        return;
+    }
+    let mut roll_pressed = keys.just_pressed(KeyCode::Space);
+    for interaction in &roll {
+        if *interaction == Interaction::Pressed { roll_pressed = true; break; }
+    }
+    if roll_pressed && state.phase == TurnPhase::Roll {
+        use rand::Rng;
+        let dice = rand::thread_rng().gen_range(1..=6);
+        state.pending_dice = Some(dice);
+        for mut d in &mut dice_anim { d.roll_to(dice); }
     }
     for interaction in &menu {
         if *interaction == Interaction::Pressed {
@@ -1032,7 +1060,9 @@ pub fn refresh_board_ui(
     let Some(state) = state else {
         return;
     };
-    if state.revision == ui.last_revision {
+    // Si hay dado pendiente rodando, forzar refresco aunque revision no haya cambiado
+    let needs_refresh = state.revision != ui.last_revision || state.pending_dice.is_some();
+    if !needs_refresh {
         return;
     }
     ui.last_revision = state.revision;
@@ -1043,9 +1073,13 @@ pub fn refresh_board_ui(
             tr("Turno: {}").replace("{}", &state.player_name(state.current)),
         ));
     }
-    let dice_label = match state.dice {
-        Some(dice) => tr("Dado: {dice}").replace("{dice}", &dice.to_string()),
-        None => tr("Dado: -"),
+    let dice_label = if state.pending_dice.is_some() {
+        "Dado: 🎲...".to_string()
+    } else {
+        match state.dice {
+            Some(dice) => tr("Dado: {dice}").replace("{dice}", &dice.to_string()),
+            None => tr("Dado: -"),
+        }
     };
     for entity in &dice_text {
         commands.entity(entity).insert(Text::new(dice_label.clone()));

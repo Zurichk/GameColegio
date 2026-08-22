@@ -66,6 +66,8 @@ pub enum GameState {
     ScienceMenu,
     /// Práctica de lectura y escritura.
     ReadingPractice,
+    /// Lectura en MAYÚSCULAS (vocales, sílabas, palabras).
+    UppercasePractice,
     /// Práctica de ortografía (elegir la palabra bien escrita).
     SpellingPractice,
     /// Juego del ahorcado.
@@ -120,6 +122,22 @@ pub enum GameState {
     BingoGame,
     /// Ajedrez.
     ChessGame,
+    /// Adivina el Animal (5 pistas por nivel).
+    AnimalGame,
+    /// Pintar punteado (une los puntos).
+    PaintingGame,
+    /// Laberinto.
+    LabyrinthGame,
+    /// Sudoku 9×9.
+    SudokuGame,
+    /// Sopa de Letras.
+    WordSearchGame,
+    /// Tangram.
+    TangramGame,
+    /// Puzzle 15 deslizante.
+    Puzzle15Game,
+    /// Busca Diferencias.
+    DifferencesGame,
     /// Dominó.
     DominoGame,
     /// Uno.

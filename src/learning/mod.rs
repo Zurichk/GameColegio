@@ -28,6 +28,7 @@ pub mod sequence;
 pub mod spelling;
 pub mod synonyms;
 pub mod trivia;
+pub mod uppercase;
 pub mod vocab;
 pub mod word_problems;
 
@@ -43,6 +44,7 @@ impl Plugin for LearningPlugin {
         app.add_plugins((
             menu::LearningMenuPlugin,
             reading::ReadingPlugin,
+            uppercase::UppercasePlugin,
             spelling::SpellingPlugin,
             hangman::HangmanPlugin,
             synonyms::SynonymPlugin,
